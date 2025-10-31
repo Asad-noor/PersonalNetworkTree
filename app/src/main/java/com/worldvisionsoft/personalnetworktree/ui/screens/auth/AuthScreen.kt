@@ -1,0 +1,304 @@
+package com.worldvisionsoft.personalnetworktree.ui.screens.auth
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.worldvisionsoft.personalnetworktree.ui.theme.PersonalNetworkTreeTheme
+
+@Composable
+fun AuthScreen(
+    onNavigateToHome: () -> Unit = {},
+    viewModel: AuthViewModel = viewModel()
+) {
+    var isLoginMode by remember { mutableStateOf(true) }
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var showResetPasswordDialog by remember { mutableStateOf(false) }
+    var resetEmail by remember { mutableStateOf("") }
+
+    val authState by viewModel.authState.collectAsState()
+
+    // Handle authentication success
+    LaunchedEffect(authState.isSuccess) {
+        if (authState.isSuccess) {
+            onNavigateToHome()
+            viewModel.resetAuthState()
+        }
+    }
+
+    // Show error message
+    authState.error?.let { error ->
+        LaunchedEffect(error) {
+            // Error is displayed in the UI
+        }
+    }
+
+    // Reset Password Dialog
+    if (showResetPasswordDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetPasswordDialog = false },
+            title = { Text("Reset Password") },
+            text = {
+                OutlinedTextField(
+                    value = resetEmail,
+                    onValueChange = { resetEmail = it },
+                    label = { Text("Email") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (resetEmail.isNotEmpty()) {
+                            viewModel.resetPassword(resetEmail)
+                            showResetPasswordDialog = false
+                            resetEmail = ""
+                        }
+                    }
+                ) {
+                    Text("Send Reset Link")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetPasswordDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Title
+            Text(
+                text = if (isLoginMode) "Welcome Back!" else "Create Account",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = if (isLoginMode) "Login to continue" else "Sign up to get started",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Error message
+            authState.error?.let { error ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = error,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Name field (only for signup)
+            if (!isLoginMode) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Person, contentDescription = "Name")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    enabled = !authState.isLoading
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Email field
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                leadingIcon = {
+                    Icon(Icons.Default.Email, contentDescription = "Email")
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                enabled = !authState.isLoading
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Password field
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                leadingIcon = {
+                    Icon(Icons.Default.Lock, contentDescription = "Password")
+                },
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        )
+                    }
+                },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                enabled = !authState.isLoading
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Confirm Password field (only for signup)
+            if (!isLoginMode) {
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = { Text("Confirm Password") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Lock, contentDescription = "Confirm Password")
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                            Icon(
+                                imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
+                            )
+                        }
+                    },
+                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    enabled = !authState.isLoading
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            } else {
+                Spacer(modifier = Modifier.height(8.dp))
+                // Forgot password
+                TextButton(
+                    onClick = { showResetPasswordDialog = true },
+                    modifier = Modifier.align(Alignment.End),
+                    enabled = !authState.isLoading
+                ) {
+                    Text("Forgot Password?")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Login/Signup Button
+            Button(
+                onClick = {
+                    viewModel.resetAuthState()
+
+                    if (isLoginMode) {
+                        // Validate login
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            viewModel.signIn(email, password)
+                        }
+                    } else {
+                        // Validate signup
+                        if (name.isNotBlank() && email.isNotBlank() &&
+                            password.isNotBlank() && password == confirmPassword) {
+                            viewModel.signUp(name, email, password)
+                        } else if (password != confirmPassword) {
+                            // Show error for password mismatch
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                enabled = !authState.isLoading
+            ) {
+                if (authState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        text = if (isLoginMode) "Login" else "Sign Up",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Toggle between login and signup
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (isLoginMode) "Don't have an account?" else "Already have an account?",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                TextButton(
+                    onClick = {
+                        isLoginMode = !isLoginMode
+                        viewModel.resetAuthState()
+                    },
+                    enabled = !authState.isLoading
+                ) {
+                    Text(
+                        text = if (isLoginMode) "Sign Up" else "Login",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AuthScreenPreview() {
+    PersonalNetworkTreeTheme {
+        AuthScreen()
+    }
+}
+

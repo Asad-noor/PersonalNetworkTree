@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "449531905900",
+    "project_id": "personal-network-tree",
+    "storage_bucket": "personal-network-tree.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449531905900:android:d3e021ccf9c69dc9e91549",
+        "android_client_info": {
+          "package_name": "com.worldvisionsoft.personalnetworktree"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeXt9YuHgWPv7XDQj17kzuuAz-fAaVZsA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
