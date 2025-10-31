@@ -63,20 +63,33 @@ fun NetworkGraphView(
         generateNodesFromContacts(contacts)
     }
 
+    // Compute tree edges: for each level L>1, connect each node to the nearest-by-X node from level L-1
+    val levelGroups = remember(nodes) { nodes.groupBy { it.level } }
+    val maxLevel = remember(levelGroups) { levelGroups.keys.maxOrNull() ?: 1 }
+    val treeEdges = remember(levelGroups) {
+        val edges = mutableListOf<Pair<NetworkNode, NetworkNode>>()
+        for (lvl in 2..maxLevel) {
+            val children = levelGroups[lvl].orEmpty()
+            val parents = levelGroups[lvl - 1].orEmpty()
+            if (parents.isEmpty() || children.isEmpty()) continue
+            children.forEach { child ->
+                // Pick parent whose X is closest to child.X
+                val parent = parents.minByOrNull { p -> kotlin.math.abs(p.position.x - child.position.x) }
+                if (parent != null) edges += parent to child
+            }
+        }
+        edges
+    }
+
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val screenWidth = constraints.maxWidth.toFloat()
         val screenHeight = constraints.maxHeight.toFloat()
 
         // Network Graph Canvas with zoom and pan - for drawing connections
+        val density = LocalDensity.current
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    translationX = offsetX,
-                    translationY = offsetY
-                )
                 .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, _ ->
                         scale = (scale * zoom).coerceIn(0.5f, 3f)
@@ -85,46 +98,79 @@ fun NetworkGraphView(
                     }
                 }
                 .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        // Deselect when tapping on empty space
+                    detectTapGestures { _ ->
                         selectedNodeId = null
                         showPreview = false
                     }
                 }
         ) {
             val centerX = size.width / 2
-            val rootCenterY = 150f // Root node center Y position
+            val rootCenterY = 150f // dp space used in positioning math
 
-            // Draw connections from root to level 1 nodes
-            nodes.filter { it.level == 1 }.forEach { node ->
-                val isHighlighted = selectedNodeId == node.id
-
-                // Draw line from CENTER of root to CENTER of node
-                drawLine(
-                    color = if (isHighlighted) Color(0xFFFF9800) else Color.Gray.copy(alpha = 0.5f),
-                    start = Offset(centerX, rootCenterY), // From center of root
-                    end = Offset(node.position.x, node.position.y), // To center of node
-                    strokeWidth = if (isHighlighted) 8f else 5f,
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round
-                )
+            // Helper to compute a node's top-left and radius (in pixels), matching how Boxes are placed
+            fun nodeTopLeftAndRadiusPx(xCenter: Float, yCenter: Float, isSelected: Boolean): Triple<Float, Float, Float> {
+                val nodeSizeDp = if (isSelected) 60f else 50f
+                val radiusPx = with(density) { (nodeSizeDp * scale).dp.toPx() / 2f }
+                val topLeftX = ((xCenter - (nodeSizeDp / 2f)) * scale + offsetX)
+                val topLeftY = ((yCenter - (nodeSizeDp / 2f)) * scale + offsetY)
+                return Triple(topLeftX, topLeftY, radiusPx)
             }
 
-            // Draw connections between nodes
-            nodes.forEach { node ->
-                node.connections.forEach { connectionId ->
-                    val connectedNode = nodes.find { it.id == connectionId }
-                    if (connectedNode != null) {
-                        val isHighlighted = selectedNodeId == node.id || selectedNodeId == connectionId
-                        // Draw line from CENTER of node to CENTER of connected node
-                        drawLine(
-                            color = if (isHighlighted) Color(0xFF2196F3) else Color.Gray.copy(alpha = 0.4f),
-                            start = Offset(node.position.x, node.position.y), // Center of source node
-                            end = Offset(connectedNode.position.x, connectedNode.position.y), // Center of target node
-                            strokeWidth = if (isHighlighted) 8f else 5f,
-                            cap = androidx.compose.ui.graphics.StrokeCap.Round
-                        )
-                    }
+            // Draw ROOT -> level 1 connections (bottom of root to top of child)
+            run {
+                val (rootTopLeftX, rootTopLeftY, rootRadiusPx) = nodeTopLeftAndRadiusPx(
+                    xCenter = centerX,
+                    yCenter = rootCenterY,
+                    isSelected = false
+                )
+                val rootBottomX = rootTopLeftX + rootRadiusPx
+                val rootBottomY = rootTopLeftY + rootRadiusPx * 2f
+
+                nodes.filter { it.level == 1 }.forEach { node ->
+                    val isHighlighted = selectedNodeId == node.id
+                    val (childTopLeftX, childTopLeftY, childRadiusPx) = nodeTopLeftAndRadiusPx(
+                        xCenter = node.position.x,
+                        yCenter = node.position.y,
+                        isSelected = selectedNodeId == node.id
+                    )
+                    val childTopX = childTopLeftX + childRadiusPx
+                    val childTopY = childTopLeftY
+
+                    drawLine(
+                        color = if (isHighlighted) Color(0xFFFF9800) else Color.Gray.copy(alpha = 0.5f),
+                        start = Offset(rootBottomX, rootBottomY),
+                        end = Offset(childTopX, childTopY),
+                        strokeWidth = if (isHighlighted) 12f else 8f,
+                        cap = androidx.compose.ui.graphics.StrokeCap.Round
+                    )
                 }
+            }
+
+            // Draw computed tree edges (bottom of parent to top of child)
+            treeEdges.forEach { (parent, child) ->
+                val isHighlighted = selectedNodeId == parent.id || selectedNodeId == child.id
+                val (srcTopLeftX, srcTopLeftY, srcRadiusPx) = nodeTopLeftAndRadiusPx(
+                    xCenter = parent.position.x,
+                    yCenter = parent.position.y,
+                    isSelected = selectedNodeId == parent.id
+                )
+                val (dstTopLeftX, dstTopLeftY, dstRadiusPx) = nodeTopLeftAndRadiusPx(
+                    xCenter = child.position.x,
+                    yCenter = child.position.y,
+                    isSelected = selectedNodeId == child.id
+                )
+                val srcBottomX = srcTopLeftX + srcRadiusPx
+                val srcBottomY = srcTopLeftY + srcRadiusPx * 2f
+                val dstTopX = dstTopLeftX + dstRadiusPx
+                val dstTopY = dstTopLeftY
+
+                drawLine(
+                    color = if (isHighlighted) Color(0xFF2196F3) else Color.Gray.copy(alpha = 0.5f),
+                    start = Offset(srcBottomX, srcBottomY),
+                    end = Offset(dstTopX, dstTopY),
+                    strokeWidth = if (isHighlighted) 12f else 8f,
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
             }
         }
 
@@ -445,4 +491,3 @@ private fun generateNodesFromContacts(contacts: List<Contact>): List<NetworkNode
 
     return nodes
 }
-
