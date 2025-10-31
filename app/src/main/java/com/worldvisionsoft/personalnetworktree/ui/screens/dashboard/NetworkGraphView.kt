@@ -1,6 +1,5 @@
 package com.worldvisionsoft.personalnetworktree.ui.screens.dashboard
 
-import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -25,11 +23,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.worldvisionsoft.personalnetworktree.data.model.Contact
 import com.worldvisionsoft.personalnetworktree.data.repository.ContactRepository
 import java.util.Locale
-import kotlin.math.sqrt
 
 data class NetworkNode(
     val id: String,
@@ -81,7 +79,17 @@ fun NetworkGraphView(
         edges
     }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTransformGestures { _, pan, zoom, _ ->
+                    scale = (scale * zoom).coerceIn(0.5f, 3f)
+                    offsetX += pan.x
+                    offsetY += pan.y
+                }
+            }
+    ) {
         val screenWidth = constraints.maxWidth.toFloat()
         val screenHeight = constraints.maxHeight.toFloat()
 
@@ -90,13 +98,6 @@ fun NetworkGraphView(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, _ ->
-                        scale = (scale * zoom).coerceIn(0.5f, 3f)
-                        offsetX += pan.x
-                        offsetY += pan.y
-                    }
-                }
                 .pointerInput(Unit) {
                     detectTapGestures { _ ->
                         selectedNodeId = null
@@ -174,6 +175,73 @@ fun NetworkGraphView(
             }
         }
 
+        // Draw level labels on the left side
+        // Label for "Me" at root level
+        Card(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        (16 * scale + offsetX).toInt(),
+                        ((150f - 15) * scale + offsetY).toInt()
+                    )
+                },
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFFF9800).copy(alpha = 0.15f)
+            )
+        ) {
+            Text(
+                text = "Me",
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFFF9800)
+            )
+        }
+
+        // Labels for each relationship level
+        levelGroups.keys.sorted().forEach { level ->
+            val levelLabel = when (level) {
+                1 -> "Close Friends"
+                2 -> "Classmates"
+                3 -> "Batch Mates"
+                4 -> "Colleagues"
+                5 -> "Extended Network"
+                else -> "Level $level"
+            }
+
+            val levelColor = when (level) {
+                1 -> Color(0xFFE91E63)
+                2 -> Color(0xFF9C27B0)
+                3 -> Color(0xFF3F51B5)
+                4 -> Color(0xFF009688)
+                5 -> Color(0xFF4CAF50)
+                else -> Color(0xFF6200EE)
+            }
+
+            val yPosition = 150f + (level * 250f)
+
+            Card(
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            (16 * scale + offsetX).toInt(),
+                            ((yPosition - 15) * scale + offsetY).toInt()
+                        )
+                    },
+                colors = CardDefaults.cardColors(
+                    containerColor = levelColor.copy(alpha = 0.15f)
+                )
+            ) {
+                Text(
+                    text = levelLabel,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = levelColor
+                )
+            }
+        }
+
         // Draw root node (User) with profile image
         Box(
             modifier = Modifier
@@ -246,7 +314,7 @@ fun NetworkGraphView(
 
                     if (!imageLoadFailed) {
                         AsyncImage(
-                            model = Uri.parse(node.photoUrl),
+                            model = node.photoUrl.toUri(),
                             contentDescription = node.name,
                             modifier = Modifier
                                 .fillMaxSize()
@@ -327,6 +395,19 @@ fun NetworkGraphView(
         if (showPreview && selectedNodeId != null) {
             val selectedNode = nodes.find { it.id == selectedNodeId }
             selectedNode?.let { node ->
+                // Get relationship level info
+                val levelLabel = when (node.level) {
+                    1 -> "Close Friends"
+                    2 -> "Classmates"
+                    3 -> "Batch Mates"
+                    4 -> "Colleagues"
+                    5 -> "Extended Network"
+                    else -> "Level ${node.level}"
+                }
+
+                // Count contacts at the same level
+                val sameLevelCount = nodes.count { it.level == node.level }
+
                 Card(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -348,8 +429,15 @@ fun NetworkGraphView(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Connections: ${node.connections.size}",
+                            text = levelLabel,
                             style = MaterialTheme.typography.bodyMedium,
+                            color = node.color,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "$sameLevelCount ${if (sameLevelCount == 1) "contact" else "contacts"} at this level",
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))

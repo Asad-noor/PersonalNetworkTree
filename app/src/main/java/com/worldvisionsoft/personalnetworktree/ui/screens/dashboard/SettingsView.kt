@@ -4,18 +4,22 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun SettingsView(
-    onSignOut: () -> Unit = {}
+    onSignOut: () -> Unit = {},
+    onPrivacyPolicyClick: () -> Unit = {}
 ) {
     val currentUser = FirebaseAuth.getInstance().currentUser
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -59,21 +63,19 @@ fun SettingsView(
 
         // Settings Options
         SettingsOption(
-            icon = Icons.Default.Notifications,
-            title = "Notifications",
-            subtitle = "Manage notification preferences"
-        )
-
-        SettingsOption(
             icon = Icons.Default.Lock,
-            title = "Privacy",
-            subtitle = "Control your privacy settings"
+            title = "Privacy Policy",
+            subtitle = "View our privacy policy",
+            onClick = onPrivacyPolicyClick
         )
 
         SettingsOption(
             icon = Icons.Default.Info,
             title = "About",
-            subtitle = "App version and information"
+            subtitle = "App version and information",
+            onClick = {
+                Toast.makeText(context, "Personal Network Tree v1.0.0", Toast.LENGTH_SHORT).show()
+            }
         )
 
         Spacer(modifier = Modifier.weight(1f))

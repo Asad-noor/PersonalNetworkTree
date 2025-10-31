@@ -11,6 +11,7 @@ import com.worldvisionsoft.personalnetworktree.ui.screens.search.SearchScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.contact.AddEditContactScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.contact.ContactDetailScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.contact.AddInteractionScreen
+import com.worldvisionsoft.personalnetworktree.ui.screens.PrivacyPolicyScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -66,6 +67,12 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onSearchClick = {
                     navController.navigate("search")
+                },
+                onPrivacyPolicyClick = {
+                    navController.navigate("privacyPolicy")
+                },
+                onAddReminder = {
+                    navController.navigate("addReminder")
                 }
             )
         }
@@ -123,10 +130,34 @@ fun NavGraph(navController: NavHostController) {
             val contactId = backStackEntry.arguments?.getString("contactId") ?: ""
             AddInteractionScreen(
                 contactId = contactId,
+                contactName = "", // Will be loaded from contact data
                 onBackClick = {
                     navController.popBackStack()
                 },
                 onSaved = {
+                    navController.popBackStack()
+                },
+                isReminderMode = false
+            )
+        }
+
+        composable(route = "addReminder") {
+            AddInteractionScreen(
+                contactId = "",
+                contactName = "",
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSaved = {
+                    navController.popBackStack()
+                },
+                isReminderMode = true
+            )
+        }
+
+        composable(route = "privacyPolicy") {
+            PrivacyPolicyScreen(
+                onBackClick = {
                     navController.popBackStack()
                 }
             )

@@ -10,13 +10,17 @@ fun HomeScreen(
     onSignOut: () -> Unit = {},
     onAddContact: () -> Unit = {},
     onSearchClick: () -> Unit = {},
-    onContactClick: (String) -> Unit = {}
+    onContactClick: (String) -> Unit = {},
+    onPrivacyPolicyClick: () -> Unit = {},
+    onAddReminder: () -> Unit = {}
 ) {
     DashboardScreen(
         onSignOut = onSignOut,
         onAddContact = onAddContact,
         onSearchClick = onSearchClick,
-        onContactClick = onContactClick
+        onContactClick = onContactClick,
+        onPrivacyPolicyClick = onPrivacyPolicyClick,
+        onAddReminder = onAddReminder
     )
 }
 

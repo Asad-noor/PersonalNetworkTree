@@ -26,7 +26,9 @@ fun DashboardScreen(
     onSignOut: () -> Unit = {},
     onAddContact: () -> Unit = {},
     onSearchClick: () -> Unit = {},
-    onContactClick: (String) -> Unit = {}
+    onContactClick: (String) -> Unit = {},
+    onPrivacyPolicyClick: () -> Unit = {},
+    onAddReminder: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(NavigationItem.NETWORK) }
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -67,14 +69,17 @@ fun DashboardScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddContact,
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Contact"
-                )
+            // Show FAB only on Network and Contacts tabs
+            if (selectedTab == NavigationItem.NETWORK || selectedTab == NavigationItem.CONTACTS) {
+                FloatingActionButton(
+                    onClick = onAddContact,
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add Contact"
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -91,8 +96,13 @@ fun DashboardScreen(
                 NavigationItem.CONTACTS -> ContactsListView(
                     onContactClick = onContactClick
                 )
-                NavigationItem.REMINDERS -> RemindersView()
-                NavigationItem.SETTINGS -> SettingsView(onSignOut = onSignOut)
+                NavigationItem.REMINDERS -> RemindersView(
+                    onAddReminderClick = onAddReminder
+                )
+                NavigationItem.SETTINGS -> SettingsView(
+                    onSignOut = onSignOut,
+                    onPrivacyPolicyClick = onPrivacyPolicyClick
+                )
             }
         }
     }

@@ -64,7 +64,7 @@ class AuthViewModel(
 
             result.fold(
                 onSuccess = {
-                    _authState.value = AuthState(error = "Password reset email sent!")
+                    _authState.value = AuthState(error = "Password reset email sent! Please check your inbox and spam folder.")
                 },
                 onFailure = { exception ->
                     _authState.value = AuthState(error = exception.message ?: "Password reset failed")

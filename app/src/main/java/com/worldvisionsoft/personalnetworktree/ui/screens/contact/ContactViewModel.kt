@@ -6,8 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.worldvisionsoft.personalnetworktree.data.model.Contact
 import com.worldvisionsoft.personalnetworktree.data.model.Interaction
+import com.worldvisionsoft.personalnetworktree.data.model.InteractionType
+import com.worldvisionsoft.personalnetworktree.data.model.Reminder
 import com.worldvisionsoft.personalnetworktree.data.model.Tag
 import com.worldvisionsoft.personalnetworktree.data.repository.ContactRepository
+import com.worldvisionsoft.personalnetworktree.data.repository.ReminderRepository
+import com.worldvisionsoft.personalnetworktree.util.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,10 +28,12 @@ data class ContactUiState(
 )
 
 class ContactViewModel(
-    private val context: Context? = null
+    context: Context? = null
 ) : ViewModel() {
 
-    private val repository = ContactRepository(context)
+    private val appContext: Context? = context?.applicationContext
+    private val repository = ContactRepository(appContext)
+    private val reminderRepository = ReminderRepository()
     private val _uiState = MutableStateFlow(ContactUiState())
     val uiState: StateFlow<ContactUiState> = _uiState.asStateFlow()
 
@@ -112,6 +118,44 @@ class ContactViewModel(
         }
     }
 
+    fun addReminder(
+        contactId: String,
+        contactName: String,
+        title: String,
+        description: String,
+        location: String,
+        type: InteractionType,
+        reminderDateTime: Long
+    ) {
+        viewModelScope.launch {
+            val reminder = Reminder(
+                contactId = contactId,
+                contactName = contactName,
+                title = title,
+                description = description,
+                location = location,
+                interactionType = type,
+                reminderDateTime = reminderDateTime
+            )
+
+            val result = reminderRepository.addReminder(reminder)
+            result.fold(
+                onSuccess = {
+                    // Success - the UI will handle opening the Calendar app
+                    _uiState.value = _uiState.value.copy(
+                        successMessage = "reminder_saved", // Signal to UI
+                        contact = _uiState.value.contact?.copy() // Trigger state change
+                    )
+                },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(
+                        error = error.message ?: "Failed to set reminder"
+                    )
+                }
+            )
+        }
+    }
+
     fun deleteContact(contactId: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val result = repository.deleteContact(contactId)
@@ -130,8 +174,11 @@ class ContactViewModel(
         _uiState.value = _uiState.value.copy(error = null)
     }
 
+    fun clearSuccessMessage() {
+        _uiState.value = _uiState.value.copy(successMessage = null)
+    }
+
     fun resetSavedState() {
         _uiState.value = _uiState.value.copy(isSaved = false)
     }
 }
-

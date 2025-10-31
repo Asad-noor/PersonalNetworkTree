@@ -1,6 +1,9 @@
 package com.worldvisionsoft.personalnetworktree.ui.screens.contact
 
+
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -9,7 +12,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.worldvisionsoft.personalnetworktree.data.model.Interaction
 import com.worldvisionsoft.personalnetworktree.data.model.InteractionType
@@ -23,21 +29,79 @@ fun AddInteractionScreen(
     contactName: String = "",
     onBackClick: () -> Unit = {},
     onSaved: () -> Unit = {},
-    viewModel: ContactViewModel = viewModel()
+    viewModel: ContactViewModel = viewModel(),
+    isReminderMode: Boolean = false
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val contactViewModel: ContactViewModel = viewModel(
+        factory = remember(context) {
+            object : androidx.lifecycle.ViewModelProvider.Factory {
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                    @Suppress("UNCHECKED_CAST")
+                    return ContactViewModel(context) as T
+                }
+            }
+        }
+    )
+
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(InteractionType.MEETING) }
     var showTypeDialog by remember { mutableStateOf(false) }
     var selectedDate by remember { mutableStateOf(System.currentTimeMillis()) }
+    var setReminder by remember { mutableStateOf(isReminderMode) }
+    var reminderDateTime by remember { mutableStateOf(System.currentTimeMillis() + 86400000) } // Default: tomorrow
+    var selectedContactId by remember { mutableStateOf(contactId) }
+    var selectedContactName by remember { mutableStateOf(contactName) }
+    var showContactPicker by remember { mutableStateOf(false) }
 
     val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
+    val timeFormat = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
+    val dateTimeFormat = remember { SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault()) }
+
+    // Observe ViewModel state for success/error messages
+    val uiState by contactViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // React to success: show snackbar and navigate back
+    LaunchedEffect(uiState.successMessage) {
+        uiState.successMessage?.let { message ->
+            if (message == "reminder_saved") {
+                // Open Calendar app with the reminder details
+                val reminder = com.worldvisionsoft.personalnetworktree.data.model.Reminder(
+                    contactId = selectedContactId,
+                    contactName = selectedContactName,
+                    title = title,
+                    description = description,
+                    location = location,
+                    interactionType = selectedType,
+                    reminderDateTime = reminderDateTime
+                )
+                com.worldvisionsoft.personalnetworktree.util.ReminderScheduler.schedule(context, reminder)
+                snackbarHostState.showSnackbar("Reminder saved! Opening Calendar app...")
+            } else {
+                snackbarHostState.showSnackbar(message)
+            }
+            contactViewModel.clearSuccessMessage()
+            onSaved()
+        }
+    }
+
+    // React to error: show snackbar and clear error
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            contactViewModel.clearError()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Log Interaction") },
+                title = { Text(if (setReminder || isReminderMode) "Set Reminder" else "Log Interaction") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, "Back")
@@ -46,25 +110,35 @@ fun AddInteractionScreen(
                 actions = {
                     TextButton(
                         onClick = {
-                            val interaction = Interaction(
-                                contactId = contactId,
-                                type = selectedType,
-                                title = title,
-                                description = description,
-                                location = location,
-                                date = selectedDate
-                            )
-                            viewModel.addInteraction(interaction)
-                            onSaved()
+                            if (setReminder || isReminderMode) {
+                                // Save reminder and open Calendar app
+                                contactViewModel.addReminder(
+                                    contactId = selectedContactId,
+                                    contactName = selectedContactName,
+                                    title = title,
+                                    description = description,
+                                    location = location,
+                                    type = selectedType,
+                                    reminderDateTime = reminderDateTime
+                                )
+                            } else {
+                                // Save as interaction only
+                                val interaction = Interaction(
+                                    contactId = selectedContactId,
+                                    type = selectedType,
+                                    title = title,
+                                    description = description,
+                                    location = location,
+                                    date = selectedDate
+                                )
+                                contactViewModel.addInteraction(interaction)
+                            }
                         },
-                        enabled = title.isNotBlank()
+                        enabled = title.isNotEmpty() && selectedContactId.isNotEmpty()
                     ) {
-                        Text("SAVE")
+                        Text("Save")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                }
             )
         }
     ) { paddingValues ->
@@ -76,8 +150,44 @@ fun AddInteractionScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Contact name
-            if (contactName.isNotEmpty()) {
+            // Contact selection (shown when creating reminder from Reminders screen)
+            if (isReminderMode || selectedContactId.isEmpty()) {
+                OutlinedCard(
+                    onClick = { showContactPicker = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Person, null)
+                            Column {
+                                Text(
+                                    text = "Contact *",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = if (selectedContactName.isNotEmpty())
+                                        selectedContactName
+                                    else
+                                        "Select a contact",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+                        Icon(Icons.Default.ArrowDropDown, null)
+                    }
+                }
+            } else if (selectedContactName.isNotEmpty()) {
+                // Contact name display for existing contact interaction
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -96,7 +206,7 @@ fun AddInteractionScreen(
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = "Interaction with $contactName",
+                            text = "Interaction with $selectedContactName",
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -215,6 +325,128 @@ fun AddInteractionScreen(
                     Icon(Icons.Default.ArrowDropDown, null)
                 }
             }
+
+            // Set Reminder Toggle
+            if (!isReminderMode) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (setReminder)
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Alarm,
+                                null,
+                                tint = if (setReminder)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurface
+                            )
+                            Column {
+                                Text(
+                                    text = "Set Reminder",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "Get notified about this interaction",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Switch(
+                            checked = setReminder,
+                            onCheckedChange = { setReminder = it }
+                        )
+                    }
+                }
+            }
+
+            // Reminder Date & Time (shown when reminder is enabled or in reminder mode)
+            if (setReminder || isReminderMode) {
+                OutlinedCard(
+                    onClick = {
+                        // Use default Android DatePickerDialog followed by TimePickerDialog
+                        val cal = java.util.Calendar.getInstance().apply { timeInMillis = reminderDateTime }
+                        val initYear = cal.get(java.util.Calendar.YEAR)
+                        val initMonth = cal.get(java.util.Calendar.MONTH)
+                        val initDay = cal.get(java.util.Calendar.DAY_OF_MONTH)
+                        val initHour = cal.get(java.util.Calendar.HOUR_OF_DAY)
+                        val initMinute = cal.get(java.util.Calendar.MINUTE)
+
+                        val datePicker = android.app.DatePickerDialog(
+                            context,
+                            { _, year, month, dayOfMonth ->
+                                cal.set(java.util.Calendar.YEAR, year)
+                                cal.set(java.util.Calendar.MONTH, month)
+                                cal.set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                                val timePicker = android.app.TimePickerDialog(
+                                    context,
+                                    { _, hourOfDay, minute ->
+                                        cal.set(java.util.Calendar.HOUR_OF_DAY, hourOfDay)
+                                        cal.set(java.util.Calendar.MINUTE, minute)
+                                        cal.set(java.util.Calendar.SECOND, 0)
+                                        cal.set(java.util.Calendar.MILLISECOND, 0)
+                                        reminderDateTime = cal.timeInMillis
+                                    },
+                                    initHour,
+                                    initMinute,
+                                    false // 12-hour view with AM/PM
+                                )
+                                timePicker.show()
+                            },
+                            initYear,
+                            initMonth,
+                            initDay
+                        )
+                        datePicker.show()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Notifications, null)
+                            Column {
+                                Text(
+                                    text = "Reminder Date & Time",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = dateTimeFormat.format(Date(reminderDateTime)),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+                        Icon(Icons.Default.ArrowDropDown, null)
+                    }
+                }
+            }
         }
     }
 
@@ -269,5 +501,60 @@ fun AddInteractionScreen(
             }
         )
     }
-}
 
+    // Contact Picker Dialog
+    if (showContactPicker) {
+        val repository = remember { com.worldvisionsoft.personalnetworktree.data.repository.ContactRepository(context) }
+        val contacts by repository.contacts.collectAsState(initial = emptyList())
+
+        AlertDialog(
+            onDismissRequest = { showContactPicker = false },
+            title = { Text("Select Contact") },
+            text = {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(contacts) { contact ->
+                        OutlinedCard(
+                            onClick = {
+                                selectedContactId = contact.id
+                                selectedContactName = contact.name
+                                showContactPicker = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.Person, null)
+                                Column {
+                                    Text(
+                                        text = contact.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    if (contact.company.isNotEmpty()) {
+                                        Text(
+                                            text = contact.company,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showContactPicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
