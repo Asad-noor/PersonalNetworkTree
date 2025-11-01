@@ -41,9 +41,14 @@ fun DashboardScreen(
                 title = { Text(stringResource(R.string.personal_network_tree)) },
                 actions = {
                     IconButton(onClick = {
-                        // Switch to Contacts tab and show search
-                        selectedTab = NavigationItem.CONTACTS
-                        showSearchInContacts = true
+                        if (selectedTab == NavigationItem.CONTACTS) {
+                            // Already on Contacts tab - toggle search visibility
+                            showSearchInContacts = !showSearchInContacts
+                        } else {
+                            // Switch to Contacts tab and show search
+                            selectedTab = NavigationItem.CONTACTS
+                            showSearchInContacts = true
+                        }
                     }) {
                         Icon(
                             imageVector = Icons.Default.Search,

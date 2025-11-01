@@ -40,6 +40,13 @@ fun ContactsListView(
     var searchQuery by remember { mutableStateOf("") }
     var isSearchVisible by remember { mutableStateOf(showSearchInitially) }
 
+    // React to showSearchInitially changes
+    androidx.compose.runtime.LaunchedEffect(showSearchInitially) {
+        if (showSearchInitially) {
+            isSearchVisible = true
+        }
+    }
+
     val filteredContacts = remember(searchQuery, contacts) {
         if (searchQuery.isEmpty()) {
             contacts
