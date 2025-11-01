@@ -29,7 +29,7 @@ class AuthViewModel(
         return getApplication<Application>().getString(resId)
     }
 
-    fun signUp(name: String, email: String, password: String) {
+    fun signUp(email: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState(isLoading = true)
 

@@ -8,6 +8,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.UUID
+import androidx.core.net.toUri
 
 object ImageUtils {
 
@@ -68,12 +69,12 @@ object ImageUtils {
      * Deletes a contact photo from internal storage
      */
     fun deleteContactPhoto(context: Context, photoPath: String?): Boolean {
-        var file: File? = null
+        var file: File?
 
         return try {
             if (photoPath.isNullOrEmpty()) return false
 
-            val uri = Uri.parse(photoPath)
+            val uri = photoPath.toUri()
             file = File(uri.path ?: return false)
 
             if (file.exists()) {
@@ -86,7 +87,6 @@ object ImageUtils {
             false
         } finally {
             // Nullify file reference to help with garbage collection
-            file = null
         }
     }
 }

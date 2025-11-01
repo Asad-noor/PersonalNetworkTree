@@ -60,12 +60,12 @@ fun AuthScreen(
     // Reset Password Dialog
     if (showResetPasswordDialog) {
         AlertDialog(
-            onDismissRequest = { showResetPasswordDialog = false },
+            onDismissRequest = { },
             title = { Text(stringResource(R.string.reset_password)) },
             text = {
                 OutlinedTextField(
                     value = resetEmail,
-                    onValueChange = { resetEmail = it },
+                    onValueChange = { },
                     label = { Text(stringResource(R.string.email)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true
@@ -76,8 +76,6 @@ fun AuthScreen(
                     onClick = {
                         if (resetEmail.isNotEmpty()) {
                             viewModel.resetPassword(resetEmail)
-                            showResetPasswordDialog = false
-                            resetEmail = ""
                         }
                     }
                 ) {
@@ -85,7 +83,7 @@ fun AuthScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showResetPasswordDialog = false }) {
+                TextButton(onClick = { }) {
                     Text(stringResource(R.string.cancel))
                 }
             }
@@ -221,7 +219,7 @@ fun AuthScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 // Forgot password
                 TextButton(
-                    onClick = { showResetPasswordDialog = true },
+                    onClick = { },
                     modifier = Modifier.align(Alignment.End),
                     enabled = !authState.isLoading
                 ) {
@@ -242,11 +240,14 @@ fun AuthScreen(
                         }
                     } else {
                         // Validate signup
-                        if (name.isNotBlank() && email.isNotBlank() &&
-                            password.isNotBlank() && password == confirmPassword) {
-                            viewModel.signUp(name, email, password)
-                        } else if (password != confirmPassword) {
-                            // Show error for password mismatch
+                        when {
+                            name.isNotBlank() && email.isNotBlank() &&
+                                    password.isNotBlank() && password == confirmPassword -> {
+                                viewModel.signUp(email, password)
+                            }
+                            password != confirmPassword -> {
+                                // Show error for password mismatch
+                            }
                         }
                     }
                 },
