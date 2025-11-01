@@ -18,13 +18,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.worldvisionsoft.personalnetworktree.R
+import com.worldvisionsoft.personalnetworktree.ui.screens.auth.AuthViewModel
 import com.worldvisionsoft.personalnetworktree.ui.theme.PersonalNetworkTreeTheme
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
+    authViewModel: AuthViewModel = viewModel(),
     onNavigateToAuth: () -> Unit = {},
     onNavigateToHome: () -> Unit = {}
 ) {
@@ -37,9 +39,8 @@ fun SplashScreen(
         )
         delay(2000)
 
-        // Check if user is already logged in
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
+        // Check if user is already logged in using ViewModel
+        if (authViewModel.isUserLoggedIn()) {
             onNavigateToHome()
         } else {
             onNavigateToAuth()
@@ -52,7 +53,6 @@ fun SplashScreen(
             .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center
     ) {
-        // You can replace this with your app logo
         Image(
             painter = painterResource(id = R.drawable.ic_launcher_foreground),
             contentDescription = stringResource(R.string.cd_app_logo),

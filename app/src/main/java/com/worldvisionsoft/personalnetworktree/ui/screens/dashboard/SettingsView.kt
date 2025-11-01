@@ -12,15 +12,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
 import androidx.compose.ui.res.stringResource
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.worldvisionsoft.personalnetworktree.R
+import com.worldvisionsoft.personalnetworktree.ui.screens.auth.AuthViewModel
 
 @Composable
 fun SettingsView(
+    authViewModel: AuthViewModel = viewModel(),
     onSignOut: () -> Unit = {},
     onPrivacyPolicyClick: () -> Unit = {}
 ) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
+    val currentUser = authViewModel.currentUser
     val context = LocalContext.current
 
     Column(

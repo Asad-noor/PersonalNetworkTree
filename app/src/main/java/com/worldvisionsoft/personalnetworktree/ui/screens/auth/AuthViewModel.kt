@@ -3,6 +3,7 @@ package com.worldvisionsoft.personalnetworktree.ui.screens.auth
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseUser
 import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,10 @@ class AuthViewModel(
 
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
+
+    // Expose current user for UI layer
+    val currentUser: FirebaseUser?
+        get() = authRepository.currentUser
 
     private fun getString(resId: Int): String {
         return getApplication<Application>().getString(resId)

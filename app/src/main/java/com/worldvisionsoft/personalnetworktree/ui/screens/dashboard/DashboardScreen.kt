@@ -8,8 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.firebase.auth.FirebaseAuth
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.worldvisionsoft.personalnetworktree.R
+import com.worldvisionsoft.personalnetworktree.ui.screens.auth.AuthViewModel
 import com.worldvisionsoft.personalnetworktree.ui.theme.PersonalNetworkTreeTheme
 
 enum class NavigationItem(
@@ -25,6 +26,7 @@ enum class NavigationItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
+    authViewModel: AuthViewModel = viewModel(),
     onSignOut: () -> Unit = {},
     onAddContact: () -> Unit = {},
     onContactClick: (String) -> Unit = {},
@@ -33,7 +35,7 @@ fun DashboardScreen(
 ) {
     var selectedTab by remember { mutableStateOf(NavigationItem.NETWORK) }
     var showSearchInContacts by remember { mutableStateOf(false) }
-    val currentUser = FirebaseAuth.getInstance().currentUser
+    val currentUser = authViewModel.currentUser
 
     Scaffold(
         topBar = {
@@ -118,6 +120,7 @@ fun DashboardScreen(
                     onAddReminderClick = onAddReminder
                 )
                 NavigationItem.SETTINGS -> SettingsView(
+                    authViewModel = authViewModel,
                     onSignOut = onSignOut,
                     onPrivacyPolicyClick = onPrivacyPolicyClick
                 )
