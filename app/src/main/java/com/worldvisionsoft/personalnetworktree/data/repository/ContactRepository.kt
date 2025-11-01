@@ -2,11 +2,13 @@ package com.worldvisionsoft.personalnetworktree.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.model.Contact
 import com.worldvisionsoft.personalnetworktree.data.model.Interaction
 import com.worldvisionsoft.personalnetworktree.data.model.Tag
@@ -22,7 +24,9 @@ class ContactRepository(private val context: Context? = null) {
     private val database = FirebaseDatabase.getInstance()
 
     private fun getUserId(): String {
-        return auth.currentUser?.uid ?: throw Exception("User not logged in")
+        val errorMessage = context?.getString(R.string.error_user_not_logged_in)
+            ?: "User not logged in"
+        return auth.currentUser?.uid ?: throw Exception(errorMessage)
     }
 
     // Firebase Database References
@@ -264,15 +268,25 @@ class ContactRepository(private val context: Context? = null) {
     }
 
     private fun getDefaultTags(): List<Tag> {
+        // Return empty list if context is not available
+        if (context == null) {
+            return emptyList()
+        }
+
+        // Helper function to get color string from color resource
+        fun getColorString(colorResId: Int): String {
+            return String.format("#%06X", 0xFFFFFF and context.getColor(colorResId))
+        }
+
         return listOf(
-            Tag(id = "1", name = "Close Friend", color = "#FF6B6B", userId = getUserId()),
-            Tag(id = "2", name = "Family", color = "#4ECDC4", userId = getUserId()),
-            Tag(id = "3", name = "Classmate", color = "#45B7D1", userId = getUserId()),
-            Tag(id = "4", name = "Colleague", color = "#FFA07A", userId = getUserId()),
-            Tag(id = "5", name = "Business", color = "#96CEB4", userId = getUserId()),
-            Tag(id = "6", name = "Mentor", color = "#FFEAA7", userId = getUserId()),
-            Tag(id = "7", name = "VC Investor", color = "#6200EE", userId = getUserId()),
-            Tag(id = "8", name = "Entrepreneur", color = "#03DAC5", userId = getUserId())
+            Tag(id = "1", name = context.getString(R.string.default_tag_close_friend), color = getColorString(R.color.tag_close_friend), userId = getUserId()),
+            Tag(id = "2", name = context.getString(R.string.default_tag_family), color = getColorString(R.color.tag_family), userId = getUserId()),
+            Tag(id = "3", name = context.getString(R.string.default_tag_classmate), color = getColorString(R.color.tag_classmate), userId = getUserId()),
+            Tag(id = "4", name = context.getString(R.string.default_tag_colleague), color = getColorString(R.color.tag_colleague), userId = getUserId()),
+            Tag(id = "5", name = context.getString(R.string.default_tag_business), color = getColorString(R.color.tag_business), userId = getUserId()),
+            Tag(id = "6", name = context.getString(R.string.default_tag_mentor), color = getColorString(R.color.tag_mentor), userId = getUserId()),
+            Tag(id = "7", name = context.getString(R.string.default_tag_vc_investor), color = getColorString(R.color.tag_vc_investor), userId = getUserId()),
+            Tag(id = "8", name = context.getString(R.string.default_tag_entrepreneur), color = getColorString(R.color.tag_entrepreneur), userId = getUserId())
         )
     }
 

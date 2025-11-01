@@ -3,6 +3,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -153,7 +154,7 @@ fun ReminderItem(
                         InteractionType.EMAIL -> Icons.Default.Email
                         InteractionType.COFFEE -> Icons.Default.LocalCafe
                         InteractionType.EVENT -> Icons.Default.Event
-                        InteractionType.NOTE -> Icons.Default.Note
+                        InteractionType.NOTE -> Icons.AutoMirrored.Filled.Note
                         InteractionType.OTHER -> Icons.Default.MoreHoriz
                     },
                     contentDescription = null,
@@ -237,7 +238,7 @@ fun ReminderItem(
     }
     if (showDeleteDialog) {
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
+            onDismissRequest = { },
             title = { Text(stringResource(R.string.delete_reminder_title)) },
             text = { Text(stringResource(R.string.delete_reminder_message)) },
             confirmButton = {
@@ -246,14 +247,13 @@ fun ReminderItem(
                         scope.launch {
                             repository.deleteReminder(reminder.id)
                         }
-                        showDeleteDialog = false
                     }
                 ) {
                     Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
+                TextButton(onClick = { }) {
                     Text(stringResource(R.string.cancel))
                 }
             }
@@ -261,7 +261,7 @@ fun ReminderItem(
     }
     if (showCompleteDialog) {
         AlertDialog(
-            onDismissRequest = { showCompleteDialog = false },
+            onDismissRequest = { },
             title = { Text(stringResource(R.string.mark_complete_title)) },
             text = { Text(stringResource(R.string.mark_complete_message)) },
             confirmButton = {
@@ -270,14 +270,13 @@ fun ReminderItem(
                         scope.launch {
                             repository.markAsCompleted(reminder.id)
                         }
-                        showCompleteDialog = false
                     }
                 ) {
                     Text(stringResource(R.string.complete))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showCompleteDialog = false }) {
+                TextButton(onClick = { }) {
                     Text(stringResource(R.string.cancel))
                 }
             }

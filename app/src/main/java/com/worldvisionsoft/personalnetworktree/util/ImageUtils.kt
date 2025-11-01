@@ -2,12 +2,17 @@ package com.worldvisionsoft.personalnetworktree.util
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import com.worldvisionsoft.personalnetworktree.R
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.UUID
 
 object ImageUtils {
+
+    private const val TAG = "ImageUtils"
+
     /**
      * Copies an image from a content URI to app's internal storage
      * This ensures the image is always accessible, even after app restart
@@ -38,18 +43,23 @@ object ImageUtils {
             // Return the file URI as a string
             Uri.fromFile(destinationFile).toString()
         } catch (e: Exception) {
-            android.util.Log.e("ImageUtils", "Error copying image", e)
+            Log.e(TAG, context.getString(R.string.log_error_copying_image), e)
             null
         } finally {
-            try {
-                inputStream?.close()
-            } catch (e: Exception) {
-                android.util.Log.e("ImageUtils", "Error closing input stream", e)
+            // Properly close all streams in finally block to ensure cleanup
+            inputStream?.let {
+                try {
+                    it.close()
+                } catch (e: Exception) {
+                    Log.e(TAG, context.getString(R.string.log_error_closing_input_stream), e)
+                }
             }
-            try {
-                outputStream?.close()
-            } catch (e: Exception) {
-                android.util.Log.e("ImageUtils", "Error closing output stream", e)
+            outputStream?.let {
+                try {
+                    it.close()
+                } catch (e: Exception) {
+                    Log.e(TAG, context.getString(R.string.log_error_closing_output_stream), e)
+                }
             }
         }
     }
@@ -58,11 +68,13 @@ object ImageUtils {
      * Deletes a contact photo from internal storage
      */
     fun deleteContactPhoto(context: Context, photoPath: String?): Boolean {
+        var file: File? = null
+
         return try {
             if (photoPath.isNullOrEmpty()) return false
 
             val uri = Uri.parse(photoPath)
-            val file = File(uri.path ?: return false)
+            file = File(uri.path ?: return false)
 
             if (file.exists()) {
                 file.delete()
@@ -70,8 +82,11 @@ object ImageUtils {
                 false
             }
         } catch (e: Exception) {
-            android.util.Log.e("ImageUtils", "Error deleting photo", e)
+            Log.e(TAG, context.getString(R.string.log_error_deleting_photo), e)
             false
+        } finally {
+            // Nullify file reference to help with garbage collection
+            file = null
         }
     }
 }

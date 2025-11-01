@@ -11,7 +11,6 @@ import com.worldvisionsoft.personalnetworktree.data.model.Reminder
 import com.worldvisionsoft.personalnetworktree.data.model.Tag
 import com.worldvisionsoft.personalnetworktree.data.repository.ContactRepository
 import com.worldvisionsoft.personalnetworktree.data.repository.ReminderRepository
-import com.worldvisionsoft.personalnetworktree.util.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

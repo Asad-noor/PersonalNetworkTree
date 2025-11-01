@@ -1,17 +1,59 @@
 package com.worldvisionsoft.personalnetworktree.ui.screens.contact
 
-import android.R.attr.text
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.Note
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,13 +62,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.model.Interaction
 import com.worldvisionsoft.personalnetworktree.data.model.InteractionType
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,8 +77,7 @@ fun ContactDetailScreen(
     contactId: String,
     onBackClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
-    onAddInteraction: () -> Unit = {},
-    viewModel: ContactViewModel = viewModel()
+    onAddInteraction: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val contextViewModel = remember { ContactViewModel(context) }
@@ -52,15 +94,15 @@ fun ContactDetailScreen(
                 title = { Text(stringResource(R.string.contact_details)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "")
                     }
                 },
                 actions = {
                     IconButton(onClick = onEditClick) {
-                        Icon(Icons.Default.Edit, "Edit")
+                        Icon(Icons.Default.Edit, "")
                     }
                     IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, "Delete")
+                        Icon(Icons.Default.Delete, "")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -108,7 +150,7 @@ fun ContactDetailScreen(
 
                                 if (!imageLoadFailed) {
                                     AsyncImage(
-                                        model = Uri.parse(contact.photoUrl),
+                                        model = contact.photoUrl.toUri(),
                                         contentDescription = contact.name,
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -257,7 +299,7 @@ fun ContactDetailScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
-                                imageVector = Icons.Default.EventNote,
+                                imageVector = Icons.AutoMirrored.Filled.EventNote,
                                 contentDescription = null,
                                 modifier = Modifier.size(48.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -287,7 +329,7 @@ fun ContactDetailScreen(
     // Delete Confirmation Dialog
     if (showDeleteDialog) {
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
+            onDismissRequest = { },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Warning,
@@ -310,7 +352,6 @@ fun ContactDetailScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        showDeleteDialog = false
                         contextViewModel.deleteContact(contactId) {
                             // On successful deletion, navigate back
                             onBackClick()
@@ -324,7 +365,7 @@ fun ContactDetailScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
+                TextButton(onClick = { }) {
                     Text(stringResource(R.string.cancel))
                 }
             }
@@ -386,7 +427,7 @@ fun InteractionCard(interaction: Interaction) {
                             InteractionType.EMAIL -> Icons.Default.Email
                             InteractionType.COFFEE -> Icons.Default.LocalCafe
                             InteractionType.EVENT -> Icons.Default.Event
-                            InteractionType.NOTE -> Icons.Default.Note
+                            InteractionType.NOTE -> Icons.AutoMirrored.Filled.Note
                             InteractionType.OTHER -> Icons.Default.MoreHoriz
                         },
                         contentDescription = null,

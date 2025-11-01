@@ -186,7 +186,7 @@ fun AddEditContactScreen(
                         // Display selected photo
                         AsyncImage(
                             model = photoUri,
-                            contentDescription = "Contact Photo",
+                            contentDescription = "",
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(CircleShape),
@@ -204,7 +204,7 @@ fun AddEditContactScreen(
                         // Display person icon
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Add Photo",
+                            contentDescription = "",
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )

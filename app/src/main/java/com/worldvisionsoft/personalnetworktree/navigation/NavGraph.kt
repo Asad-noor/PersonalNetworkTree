@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.worldvisionsoft.personalnetworktree.data.repository.AuthRepository
 import com.worldvisionsoft.personalnetworktree.ui.screens.auth.AuthScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.home.HomeScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.splash.SplashScreen
@@ -14,6 +15,8 @@ import com.worldvisionsoft.personalnetworktree.ui.screens.PrivacyPolicyScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
+    val authRepository = AuthRepository()
+
     NavHost(
         navController = navController,
         startDestination = "splash"
@@ -52,6 +55,8 @@ fun NavGraph(navController: NavHostController) {
         composable(route = "home") {
             HomeScreen(
                 onSignOut = {
+                    // Sign out from Firebase before navigating
+                    authRepository.signOut()
                     navController.navigate("auth") {
                         popUpTo("home") {
                             inclusive = true

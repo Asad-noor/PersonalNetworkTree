@@ -1,13 +1,14 @@
 package com.worldvisionsoft.personalnetworktree.ui.screens.auth
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.fold
 
 data class AuthState(
     val isLoading: Boolean = false,
@@ -16,11 +17,17 @@ data class AuthState(
 )
 
 class AuthViewModel(
+    application: Application
+) : AndroidViewModel(application) {
+
     private val authRepository: AuthRepository = AuthRepository()
-) : ViewModel() {
 
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
+
+    private fun getString(resId: Int): String {
+        return getApplication<Application>().getString(resId)
+    }
 
     fun signUp(name: String, email: String, password: String) {
         viewModelScope.launch {
@@ -33,7 +40,7 @@ class AuthViewModel(
                     _authState.value = AuthState(isSuccess = true)
                 },
                 onFailure = { exception ->
-                    _authState.value = AuthState(error = exception.message ?: "Sign up failed")
+                    _authState.value = AuthState(error = exception.message ?: getString(R.string.error_sign_up_failed))
                 }
             )
         }
@@ -50,7 +57,7 @@ class AuthViewModel(
                     _authState.value = AuthState(isSuccess = true)
                 },
                 onFailure = { exception ->
-                    _authState.value = AuthState(error = exception.message ?: "Sign in failed")
+                    _authState.value = AuthState(error = exception.message ?: getString(R.string.error_sign_in_failed))
                 }
             )
         }
@@ -64,10 +71,10 @@ class AuthViewModel(
 
             result.fold(
                 onSuccess = {
-                    _authState.value = AuthState(error = "Password reset email sent! Please check your inbox and spam folder.")
+                    _authState.value = AuthState(error = getString(R.string.success_password_reset_email_sent))
                 },
                 onFailure = { exception ->
-                    _authState.value = AuthState(error = exception.message ?: "Password reset failed")
+                    _authState.value = AuthState(error = exception.message ?: getString(R.string.error_password_reset_failed))
                 }
             )
         }

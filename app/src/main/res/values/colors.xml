@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Default Tag Colors -->
+    <color name="tag_close_friend">#FF6B6B</color>
+    <color name="tag_family">#4ECDC4</color>
+    <color name="tag_classmate">#45B7D1</color>
+    <color name="tag_colleague">#FFA07A</color>
+    <color name="tag_business">#96CEB4</color>
+    <color name="tag_mentor">#FFEAA7</color>
+    <color name="tag_vc_investor">#6200EE</color>
+    <color name="tag_entrepreneur">#03DAC5</color>
 </resources>

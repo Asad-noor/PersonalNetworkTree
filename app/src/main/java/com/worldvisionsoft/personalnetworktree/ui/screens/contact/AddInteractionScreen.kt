@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +31,6 @@ fun AddInteractionScreen(
     contactName: String = "",
     onBackClick: () -> Unit = {},
     onSaved: () -> Unit = {},
-    viewModel: ContactViewModel = viewModel(),
     isReminderMode: Boolean = false
 ) {
     val context = LocalContext.current
@@ -49,21 +50,19 @@ fun AddInteractionScreen(
     var location by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(InteractionType.MEETING) }
     var showTypeDialog by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf(System.currentTimeMillis()) }
+    var selectedDate by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var setReminder by remember { mutableStateOf(isReminderMode) }
-    var reminderDateTime by remember { mutableStateOf(System.currentTimeMillis() + 86400000) } // Default: tomorrow
+    var reminderDateTime by remember { mutableLongStateOf(System.currentTimeMillis() + 86400000) } // Default: tomorrow
     var selectedContactId by remember { mutableStateOf(contactId) }
     var selectedContactName by remember { mutableStateOf(contactName) }
     var showContactPicker by remember { mutableStateOf(false) }
 
-    val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
-    val timeFormat = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
-    val dateTimeFormat = remember { SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault()) }
+    val dateFormat = remember { SimpleDateFormat(context.getString(R.string.date_format_short), Locale.getDefault()) }
+    val dateTimeFormat = remember { SimpleDateFormat(context.getString(R.string.date_format_with_time), Locale.getDefault()) }
 
     // Observe ViewModel state for success/error messages
     val uiState by contactViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     // React to success: show snackbar and navigate back
     LaunchedEffect(uiState.successMessage) {
@@ -104,7 +103,7 @@ fun AddInteractionScreen(
                 title = { Text(if (setReminder || isReminderMode) stringResource(R.string.set_reminder) else stringResource(R.string.log_interaction_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, stringResource(R.string.cd_back))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -175,10 +174,7 @@ fun AddInteractionScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = if (selectedContactName.isNotEmpty())
-                                        selectedContactName
-                                    else
-                                        stringResource(R.string.select_a_contact),
+                                    text = selectedContactName.ifEmpty { stringResource(R.string.select_a_contact) },
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -236,7 +232,7 @@ fun AddInteractionScreen(
                                 InteractionType.EMAIL -> Icons.Default.Email
                                 InteractionType.COFFEE -> Icons.Default.LocalCafe
                                 InteractionType.EVENT -> Icons.Default.Event
-                                InteractionType.NOTE -> Icons.Default.Note
+                                InteractionType.NOTE -> Icons.AutoMirrored.Filled.Note
                                 InteractionType.OTHER -> Icons.Default.MoreHoriz
                             },
                             contentDescription = null
@@ -382,27 +378,27 @@ fun AddInteractionScreen(
                 OutlinedCard(
                     onClick = {
                         // Use default Android DatePickerDialog followed by TimePickerDialog
-                        val cal = java.util.Calendar.getInstance().apply { timeInMillis = reminderDateTime }
-                        val initYear = cal.get(java.util.Calendar.YEAR)
-                        val initMonth = cal.get(java.util.Calendar.MONTH)
-                        val initDay = cal.get(java.util.Calendar.DAY_OF_MONTH)
-                        val initHour = cal.get(java.util.Calendar.HOUR_OF_DAY)
-                        val initMinute = cal.get(java.util.Calendar.MINUTE)
+                        val cal = Calendar.getInstance().apply { timeInMillis = reminderDateTime }
+                        val initYear = cal.get(Calendar.YEAR)
+                        val initMonth = cal.get(Calendar.MONTH)
+                        val initDay = cal.get(Calendar.DAY_OF_MONTH)
+                        val initHour = cal.get(Calendar.HOUR_OF_DAY)
+                        val initMinute = cal.get(Calendar.MINUTE)
 
                         val datePicker = android.app.DatePickerDialog(
                             context,
                             { _, year, month, dayOfMonth ->
-                                cal.set(java.util.Calendar.YEAR, year)
-                                cal.set(java.util.Calendar.MONTH, month)
-                                cal.set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth)
+                                cal.set(Calendar.YEAR, year)
+                                cal.set(Calendar.MONTH, month)
+                                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
                                 val timePicker = android.app.TimePickerDialog(
                                     context,
                                     { _, hourOfDay, minute ->
-                                        cal.set(java.util.Calendar.HOUR_OF_DAY, hourOfDay)
-                                        cal.set(java.util.Calendar.MINUTE, minute)
-                                        cal.set(java.util.Calendar.SECOND, 0)
-                                        cal.set(java.util.Calendar.MILLISECOND, 0)
+                                        cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                                        cal.set(Calendar.MINUTE, minute)
+                                        cal.set(Calendar.SECOND, 0)
+                                        cal.set(Calendar.MILLISECOND, 0)
                                         reminderDateTime = cal.timeInMillis
                                     },
                                     initHour,
@@ -453,17 +449,16 @@ fun AddInteractionScreen(
     // Type selection dialog
     if (showTypeDialog) {
         AlertDialog(
-            onDismissRequest = { showTypeDialog = false },
+            onDismissRequest = { },
             title = { Text(stringResource(R.string.select_interaction_type)) },
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    InteractionType.values().forEach { type ->
+                    InteractionType.entries.forEach { type ->
                         OutlinedCard(
                             onClick = {
                                 selectedType = type
-                                showTypeDialog = false
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -481,7 +476,7 @@ fun AddInteractionScreen(
                                         InteractionType.EMAIL -> Icons.Default.Email
                                         InteractionType.COFFEE -> Icons.Default.LocalCafe
                                         InteractionType.EVENT -> Icons.Default.Event
-                                        InteractionType.NOTE -> Icons.Default.Note
+                                        InteractionType.NOTE -> Icons.AutoMirrored.Filled.Note
                                         InteractionType.OTHER -> Icons.Default.MoreHoriz
                                     },
                                     contentDescription = null
@@ -497,7 +492,7 @@ fun AddInteractionScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showTypeDialog = false }) {
+                TextButton(onClick = { }) {
                     Text(stringResource(R.string.cancel))
                 }
             }
@@ -510,7 +505,7 @@ fun AddInteractionScreen(
         val contacts by repository.contacts.collectAsState(initial = emptyList())
 
         AlertDialog(
-            onDismissRequest = { showContactPicker = false },
+            onDismissRequest = { },
             title = { Text(stringResource(R.string.select_contact)) },
             text = {
                 LazyColumn(
@@ -521,7 +516,6 @@ fun AddInteractionScreen(
                             onClick = {
                                 selectedContactId = contact.id
                                 selectedContactName = contact.name
-                                showContactPicker = false
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -553,7 +547,7 @@ fun AddInteractionScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showContactPicker = false }) {
+                TextButton(onClick = { }) {
                     Text(stringResource(R.string.cancel))
                 }
             }

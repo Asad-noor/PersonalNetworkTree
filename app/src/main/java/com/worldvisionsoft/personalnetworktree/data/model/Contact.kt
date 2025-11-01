@@ -19,14 +19,6 @@ data class Contact(
     val updatedAt: Long = System.currentTimeMillis()
 )
 
-enum class RelationshipLevel(val level: Int, val label: String, val description: String) {
-    CLOSE_CIRCLE(1, "Close Friends & Family", "Your strongest bonds"),
-    CLASSMATES(2, "Classmates & Close Colleagues", "Regular interaction"),
-    BATCH_MATES(3, "Batch Mates & Professional Network", "Occasional interaction"),
-    COLLEAGUES(4, "Colleagues & Business Contacts", "Professional relationships"),
-    EXTENDED_NETWORK(5, "Friends of Friends & Acquaintances", "Extended network")
-}
-
 data class Interaction(
     val id: String = UUID.randomUUID().toString(),
     val contactId: String = "",
