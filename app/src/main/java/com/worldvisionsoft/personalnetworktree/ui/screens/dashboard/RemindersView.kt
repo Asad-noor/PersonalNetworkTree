@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,7 +24,8 @@ import java.util.*
 fun RemindersView(
     onAddReminderClick: () -> Unit = {}
 ) {
-    val repository = remember { ReminderRepository() }
+    val context = LocalContext.current
+    val repository = remember { ReminderRepository(context) }
     val reminders by repository.reminders.collectAsState(initial = emptyList())
     val upcomingReminders = remember(reminders) {
         reminders.filter { !it.isCompleted && it.reminderDateTime >= System.currentTimeMillis() }

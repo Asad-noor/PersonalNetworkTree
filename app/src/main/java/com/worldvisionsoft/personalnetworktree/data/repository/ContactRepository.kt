@@ -2,7 +2,6 @@ package com.worldvisionsoft.personalnetworktree.data.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,13 +18,12 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
-class ContactRepository(private val context: Context? = null) {
+class ContactRepository(private val context: Context) {
     private val auth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance()
 
     private fun getUserId(): String {
-        val errorMessage = context?.getString(R.string.error_user_not_logged_in)
-            ?: "User not logged in"
+        val errorMessage = context.getString(R.string.error_user_not_logged_in)
         return auth.currentUser?.uid ?: throw Exception(errorMessage)
     }
 
@@ -62,7 +60,7 @@ class ContactRepository(private val context: Context? = null) {
             val contactId = contact.id.ifEmpty { UUID.randomUUID().toString() }
 
             // Copy the photo to internal storage so it persists after app restart
-            val photoUrl = if (photoUri != null && context != null) {
+            val photoUrl = if (photoUri != null) {
                 ImageUtils.copyImageToInternalStorage(context, photoUri, contactId) ?: ""
             } else {
                 ""
@@ -86,7 +84,7 @@ class ContactRepository(private val context: Context? = null) {
     suspend fun updateContact(contact: Contact, photoUri: Uri?): Result<Contact> {
         return try {
             // Copy new photo to internal storage if provided
-            val photoUrl = if (photoUri != null && context != null) {
+            val photoUrl = if (photoUri != null) {
                 // Delete old photo if exists
                 if (contact.photoUrl.isNotEmpty()) {
                     ImageUtils.deleteContactPhoto(context, contact.photoUrl)
@@ -116,7 +114,7 @@ class ContactRepository(private val context: Context? = null) {
             val contact = contactSnapshot.getValue(Contact::class.java)
 
             // Delete photo from internal storage if exists
-            if (contact != null && context != null) {
+            if (contact != null) {
                 ImageUtils.deleteContactPhoto(context, contact.photoUrl)
             }
 
@@ -154,51 +152,6 @@ class ContactRepository(private val context: Context? = null) {
         }
         contactRef.addValueEventListener(listener)
         awaitClose { contactRef.removeEventListener(listener) }
-    }
-
-    fun getContactsByTag(tag: String): Flow<List<Contact>> = callbackFlow {
-        val contactsRef = getContactsRef()
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val contactsList = mutableListOf<Contact>()
-                for (childSnapshot in snapshot.children) {
-                    childSnapshot.getValue(Contact::class.java)?.let { contact ->
-                        if (contact.tags.contains(tag)) {
-                            contactsList.add(contact)
-                        }
-                    }
-                }
-                trySend(contactsList)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
-            }
-        }
-        contactsRef.addValueEventListener(listener)
-        awaitClose { contactsRef.removeEventListener(listener) }
-    }
-
-    // Interaction operations
-    val interactions: Flow<List<Interaction>> = callbackFlow {
-        val interactionsRef = getInteractionsRef()
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val interactionsList = mutableListOf<Interaction>()
-                for (childSnapshot in snapshot.children) {
-                    childSnapshot.getValue(Interaction::class.java)?.let { interaction ->
-                        interactionsList.add(interaction)
-                    }
-                }
-                trySend(interactionsList.sortedByDescending { it.date })
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
-            }
-        }
-        interactionsRef.addValueEventListener(listener)
-        awaitClose { interactionsRef.removeEventListener(listener) }
     }
 
     suspend fun addInteraction(interaction: Interaction): Result<Interaction> {
@@ -268,41 +221,23 @@ class ContactRepository(private val context: Context? = null) {
     }
 
     private fun getDefaultTags(): List<Tag> {
-        // Return empty list if context is not available
-        if (context == null) {
-            return emptyList()
-        }
-
         // Helper function to get color string from color resource
         fun getColorString(colorResId: Int): String {
             return String.format("#%06X", 0xFFFFFF and context.getColor(colorResId))
         }
 
+        val userId = getUserId()
         return listOf(
-            Tag(id = "1", name = context.getString(R.string.default_tag_close_friend), color = getColorString(R.color.tag_close_friend), userId = getUserId()),
-            Tag(id = "2", name = context.getString(R.string.default_tag_family), color = getColorString(R.color.tag_family), userId = getUserId()),
-            Tag(id = "3", name = context.getString(R.string.default_tag_classmate), color = getColorString(R.color.tag_classmate), userId = getUserId()),
-            Tag(id = "4", name = context.getString(R.string.default_tag_colleague), color = getColorString(R.color.tag_colleague), userId = getUserId()),
-            Tag(id = "5", name = context.getString(R.string.default_tag_business), color = getColorString(R.color.tag_business), userId = getUserId()),
-            Tag(id = "6", name = context.getString(R.string.default_tag_mentor), color = getColorString(R.color.tag_mentor), userId = getUserId()),
-            Tag(id = "7", name = context.getString(R.string.default_tag_vc_investor), color = getColorString(R.color.tag_vc_investor), userId = getUserId()),
-            Tag(id = "8", name = context.getString(R.string.default_tag_entrepreneur), color = getColorString(R.color.tag_entrepreneur), userId = getUserId())
+            Tag(id = "1", name = context.getString(R.string.default_tag_close_friend), color = getColorString(R.color.tag_close_friend), userId = userId),
+            Tag(id = "2", name = context.getString(R.string.default_tag_family), color = getColorString(R.color.tag_family), userId = userId),
+            Tag(id = "3", name = context.getString(R.string.default_tag_classmate), color = getColorString(R.color.tag_classmate), userId = userId),
+            Tag(id = "4", name = context.getString(R.string.default_tag_colleague), color = getColorString(R.color.tag_colleague), userId = userId),
+            Tag(id = "5", name = context.getString(R.string.default_tag_business), color = getColorString(R.color.tag_business), userId = userId),
+            Tag(id = "6", name = context.getString(R.string.default_tag_mentor), color = getColorString(R.color.tag_mentor), userId = userId),
+            Tag(id = "7", name = context.getString(R.string.default_tag_vc_investor), color = getColorString(R.color.tag_vc_investor), userId = userId),
+            Tag(id = "8", name = context.getString(R.string.default_tag_entrepreneur), color = getColorString(R.color.tag_entrepreneur), userId = userId)
         )
-    }
-
-    suspend fun addTag(tag: Tag): Result<Tag> {
-        return try {
-            val userId = getUserId()
-            val tagId = tag.id.ifEmpty { UUID.randomUUID().toString() }
-            val newTag = tag.copy(id = tagId, userId = userId)
-
-            getTagsRef().child(tagId).setValue(newTag).await()
-            Result.success(newTag)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
     }
 
     fun getAllTags(): Flow<List<Tag>> = tags
 }
-

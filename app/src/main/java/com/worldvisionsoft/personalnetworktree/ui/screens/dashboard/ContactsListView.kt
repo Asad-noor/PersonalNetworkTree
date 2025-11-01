@@ -214,4 +214,3 @@ fun ContactListItem(contact: Contact, onClick: () -> Unit) {
         }
     }
 }
-

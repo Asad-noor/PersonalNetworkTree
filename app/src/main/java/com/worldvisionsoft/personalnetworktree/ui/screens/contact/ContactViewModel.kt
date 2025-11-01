@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.model.Contact
 import com.worldvisionsoft.personalnetworktree.data.model.Interaction
 import com.worldvisionsoft.personalnetworktree.data.model.InteractionType
@@ -27,12 +28,12 @@ data class ContactUiState(
 )
 
 class ContactViewModel(
-    context: Context? = null
+    context: Context
 ) : ViewModel() {
 
-    private val appContext: Context? = context?.applicationContext
+    private val appContext: Context = context.applicationContext
     private val repository = ContactRepository(appContext)
-    private val reminderRepository = ReminderRepository()
+    private val reminderRepository = ReminderRepository(appContext)
     private val _uiState = MutableStateFlow(ContactUiState())
     val uiState: StateFlow<ContactUiState> = _uiState.asStateFlow()
 
@@ -88,13 +89,16 @@ class ContactViewModel(
                         isLoading = false,
                         isSaved = true,
                         contact = it,
-                        successMessage = if (contact.id.isEmpty()) "Contact added successfully" else "Contact updated successfully"
+                        successMessage = if (contact.id.isEmpty())
+                            appContext.getString(R.string.contact_added_successfully)
+                        else
+                            appContext.getString(R.string.contact_updated_successfully)
                     )
                 },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to save contact"
+                        error = error.message ?: appContext.getString(R.string.failed_to_save_contact)
                     )
                 }
             )
@@ -110,7 +114,7 @@ class ContactViewModel(
                 },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
-                        error = error.message ?: "Failed to add interaction"
+                        error = error.message ?: appContext.getString(R.string.failed_to_add_interaction)
                     )
                 }
             )
@@ -148,7 +152,7 @@ class ContactViewModel(
                 },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
-                        error = error.message ?: "Failed to set reminder"
+                        error = error.message ?: appContext.getString(R.string.failed_to_set_reminder)
                     )
                 }
             )
@@ -162,7 +166,7 @@ class ContactViewModel(
                 onSuccess = { onSuccess() },
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
-                        error = error.message ?: "Failed to delete contact"
+                        error = error.message ?: appContext.getString(R.string.failed_to_delete_contact)
                     )
                 }
             )
@@ -181,3 +185,4 @@ class ContactViewModel(
         _uiState.value = _uiState.value.copy(isSaved = false)
     }
 }
+

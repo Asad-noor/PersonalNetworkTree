@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class ReminderRepository(private val context: Context? = null) {
+class ReminderRepository(private val context: Context) {
     private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -42,9 +42,7 @@ class ReminderRepository(private val context: Context? = null) {
                         val reminder = childSnapshot.getValue(Reminder::class.java)
                         reminder?.let { remindersList.add(it.copy(userId = userId)) }
                     } catch (e: Exception) {
-                        context?.let {
-                            Log.e(TAG, it.getString(R.string.log_error_parsing_reminder), e)
-                        } ?: Log.e(TAG, "Error parsing reminder", e)
+                        Log.e(TAG, context.getString(R.string.log_error_parsing_reminder), e)
                     }
                 }
                 // Sort by reminder date time (upcoming first)
@@ -68,8 +66,7 @@ class ReminderRepository(private val context: Context? = null) {
         return try {
             val userId = getUserId()
             if (userId.isEmpty()) {
-                val errorMessage = context?.getString(R.string.error_user_not_logged_in)
-                    ?: "User not logged in"
+                val errorMessage = context.getString(R.string.error_user_not_logged_in)
                 return Result.failure(Exception(errorMessage))
             }
 
