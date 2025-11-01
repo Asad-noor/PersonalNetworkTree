@@ -1,6 +1,5 @@
 package com.worldvisionsoft.personalnetworktree.ui.screens.contact
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,11 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.model.Interaction
 import com.worldvisionsoft.personalnetworktree.data.model.InteractionType
 import java.text.SimpleDateFormat
@@ -32,7 +32,7 @@ fun AddInteractionScreen(
     viewModel: ContactViewModel = viewModel(),
     isReminderMode: Boolean = false
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val contactViewModel: ContactViewModel = viewModel(
         factory = remember(context) {
             object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -80,7 +80,7 @@ fun AddInteractionScreen(
                     reminderDateTime = reminderDateTime
                 )
                 com.worldvisionsoft.personalnetworktree.util.ReminderScheduler.schedule(context, reminder)
-                snackbarHostState.showSnackbar("Reminder saved! Opening Calendar app...")
+                snackbarHostState.showSnackbar(context.getString(R.string.reminder_saved_message))
             } else {
                 snackbarHostState.showSnackbar(message)
             }
@@ -101,10 +101,10 @@ fun AddInteractionScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(if (setReminder || isReminderMode) "Set Reminder" else "Log Interaction") },
+                title = { Text(if (setReminder || isReminderMode) stringResource(R.string.set_reminder) else stringResource(R.string.log_interaction_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -136,7 +136,7 @@ fun AddInteractionScreen(
                         },
                         enabled = title.isNotEmpty() && selectedContactId.isNotEmpty()
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.save))
                     }
                 }
             )
@@ -170,7 +170,7 @@ fun AddInteractionScreen(
                             Icon(Icons.Default.Person, null)
                             Column {
                                 Text(
-                                    text = "Contact *",
+                                    text = stringResource(R.string.contact_required),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -178,7 +178,7 @@ fun AddInteractionScreen(
                                     text = if (selectedContactName.isNotEmpty())
                                         selectedContactName
                                     else
-                                        "Select a contact",
+                                        stringResource(R.string.select_a_contact),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -206,7 +206,7 @@ fun AddInteractionScreen(
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = "Interaction with $selectedContactName",
+                            text = stringResource(R.string.interaction_with, selectedContactName),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -243,7 +243,7 @@ fun AddInteractionScreen(
                         )
                         Column {
                             Text(
-                                text = "Type",
+                                text = stringResource(R.string.type_label),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -262,8 +262,8 @@ fun AddInteractionScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Title *") },
-                placeholder = { Text("e.g., Had coffee, Project discussion") },
+                label = { Text(stringResource(R.string.title_required)) },
+                placeholder = { Text(stringResource(R.string.title_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Title, null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -273,8 +273,8 @@ fun AddInteractionScreen(
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Description") },
-                placeholder = { Text("Discussed project X, next steps...") },
+                label = { Text(stringResource(R.string.description)) },
+                placeholder = { Text(stringResource(R.string.description_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Description, null) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -286,8 +286,8 @@ fun AddInteractionScreen(
             OutlinedTextField(
                 value = location,
                 onValueChange = { location = it },
-                label = { Text("Location") },
-                placeholder = { Text("e.g., Starbucks Downtown") },
+                label = { Text(stringResource(R.string.location)) },
+                placeholder = { Text(stringResource(R.string.location_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Place, null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -295,7 +295,7 @@ fun AddInteractionScreen(
 
             // Date
             OutlinedCard(
-                onClick = { /* TODO: Add date picker */ },
+                onClick = { /* Date picker functionality */ },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -312,7 +312,7 @@ fun AddInteractionScreen(
                         Icon(Icons.Default.CalendarToday, null)
                         Column {
                             Text(
-                                text = "Date",
+                                text = stringResource(R.string.date),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -358,12 +358,12 @@ fun AddInteractionScreen(
                             )
                             Column {
                                 Text(
-                                    text = "Set Reminder",
+                                    text = stringResource(R.string.set_reminder),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "Get notified about this interaction",
+                                    text = stringResource(R.string.get_notified_message),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -433,7 +433,7 @@ fun AddInteractionScreen(
                             Icon(Icons.Default.Notifications, null)
                             Column {
                                 Text(
-                                    text = "Reminder Date & Time",
+                                    text = stringResource(R.string.reminder_date_time),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -454,9 +454,11 @@ fun AddInteractionScreen(
     if (showTypeDialog) {
         AlertDialog(
             onDismissRequest = { showTypeDialog = false },
-            title = { Text("Select Interaction Type") },
+            title = { Text(stringResource(R.string.select_interaction_type)) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     InteractionType.values().forEach { type ->
                         OutlinedCard(
                             onClick = {
@@ -496,7 +498,7 @@ fun AddInteractionScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showTypeDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -509,7 +511,7 @@ fun AddInteractionScreen(
 
         AlertDialog(
             onDismissRequest = { showContactPicker = false },
-            title = { Text("Select Contact") },
+            title = { Text(stringResource(R.string.select_contact)) },
             text = {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -552,9 +554,10 @@ fun AddInteractionScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showContactPicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
     }
 }
+

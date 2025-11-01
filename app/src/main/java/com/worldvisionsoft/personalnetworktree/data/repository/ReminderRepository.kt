@@ -35,7 +35,7 @@ class ReminderRepository {
                         val reminder = childSnapshot.getValue(Reminder::class.java)
                         reminder?.let { remindersList.add(it.copy(userId = userId)) }
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        android.util.Log.e("ReminderRepository", "Error parsing reminder", e)
                     }
                 }
                 // Sort by reminder date time (upcoming first)

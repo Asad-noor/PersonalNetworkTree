@@ -1,5 +1,6 @@
 package com.worldvisionsoft.personalnetworktree.ui.screens.contact
 
+import android.R.attr.text
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,10 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.model.Interaction
 import com.worldvisionsoft.personalnetworktree.data.model.InteractionType
 import java.text.SimpleDateFormat
@@ -46,7 +49,7 @@ fun ContactDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Contact Details") },
+                title = { Text(stringResource(R.string.contact_details)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, "Back")
@@ -69,7 +72,7 @@ fun ContactDetailScreen(
             ExtendedFloatingActionButton(
                 onClick = onAddInteraction,
                 icon = { Icon(Icons.Default.Add, null) },
-                text = { Text("Log Interaction") }
+                text = { Text(stringResource(R.string.log_interaction)) }
             )
         }
     ) { paddingValues ->
@@ -166,7 +169,7 @@ fun ContactDetailScreen(
                     Card {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "Tags",
+                                text = stringResource(R.string.tags),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -193,7 +196,7 @@ fun ContactDetailScreen(
                     Card {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "Contact Information",
+                                text = stringResource(R.string.contact_information),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -202,7 +205,7 @@ fun ContactDetailScreen(
                             if (contact.email.isNotEmpty()) {
                                 ContactInfoRow(
                                     icon = Icons.Default.Email,
-                                    label = "Email",
+                                    label = stringResource(R.string.label_email),
                                     value = contact.email
                                 )
                                 Spacer(Modifier.height(12.dp))
@@ -211,7 +214,7 @@ fun ContactDetailScreen(
                             if (contact.phone.isNotEmpty()) {
                                 ContactInfoRow(
                                     icon = Icons.Default.Phone,
-                                    label = "Phone",
+                                    label = stringResource(R.string.label_phone),
                                     value = contact.phone
                                 )
                                 Spacer(Modifier.height(12.dp))
@@ -220,7 +223,7 @@ fun ContactDetailScreen(
                             if (contact.notes.isNotEmpty()) {
                                 ContactInfoRow(
                                     icon = Icons.Default.Description,
-                                    label = "Notes",
+                                    label = stringResource(R.string.label_notes),
                                     value = contact.notes
                                 )
                             }
@@ -237,7 +240,7 @@ fun ContactDetailScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Past Interactions (${uiState.interactions.size})",
+                        text = stringResource(R.string.past_interactions, uiState.interactions.size),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -259,13 +262,14 @@ fun ContactDetailScreen(
                                 modifier = Modifier.size(48.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Spacer(Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "No interactions yet",
+                                text = stringResource(R.string.no_interactions_yet),
                                 style = MaterialTheme.typography.titleMedium
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Log your first interaction",
+                                text = stringResource(R.string.log_first_interaction),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -293,13 +297,13 @@ fun ContactDetailScreen(
             },
             title = {
                 Text(
-                    text = "Delete Contact?",
+                    text = stringResource(R.string.delete_contact_question),
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
             text = {
                 Text(
-                    text = "Are you sure you want to delete ${uiState.contact?.name ?: "this contact"}? This action cannot be undone. All interactions and photos will also be deleted.",
+                    text = stringResource(R.string.delete_contact_confirmation, uiState.contact?.name ?: "this contact"),
                     style = MaterialTheme.typography.bodyMedium
                 )
             },
@@ -316,12 +320,12 @@ fun ContactDetailScreen(
                         containerColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

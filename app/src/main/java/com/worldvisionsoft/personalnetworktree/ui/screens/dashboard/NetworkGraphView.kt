@@ -19,12 +19,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import coil.compose.AsyncImage
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.model.Contact
 import com.worldvisionsoft.personalnetworktree.data.repository.ContactRepository
 import java.util.Locale
@@ -190,7 +192,7 @@ fun NetworkGraphView(
             )
         ) {
             Text(
-                text = "Me",
+                text = stringResource(R.string.me_label),
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
@@ -201,12 +203,12 @@ fun NetworkGraphView(
         // Labels for each relationship level
         levelGroups.keys.sorted().forEach { level ->
             val levelLabel = when (level) {
-                1 -> "Close Friends"
-                2 -> "Classmates"
-                3 -> "Batch Mates"
-                4 -> "Colleagues"
-                5 -> "Extended Network"
-                else -> "Level $level"
+                1 -> stringResource(R.string.close_friends_label)
+                2 -> stringResource(R.string.classmates_label)
+                3 -> stringResource(R.string.batch_mates_label)
+                4 -> stringResource(R.string.colleagues_label)
+                5 -> stringResource(R.string.extended_network_label)
+                else -> stringResource(R.string.level_format_label, level)
             }
 
             val levelColor = when (level) {
@@ -263,7 +265,7 @@ fun NetworkGraphView(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "You",
+                    contentDescription = stringResource(R.string.you_label),
                     modifier = Modifier.size((28 * scale).dp),
                     tint = Color.White
                 )

@@ -11,7 +11,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
+import androidx.compose.ui.res.stringResource
 import com.google.firebase.auth.FirebaseAuth
+import com.worldvisionsoft.personalnetworktree.R
 
 @Composable
 fun SettingsView(
@@ -46,7 +48,7 @@ fun SettingsView(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = "Account",
+                        text = stringResource(R.string.account_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -64,17 +66,17 @@ fun SettingsView(
         // Settings Options
         SettingsOption(
             icon = Icons.Default.Lock,
-            title = "Privacy Policy",
-            subtitle = "View our privacy policy",
+            title = stringResource(R.string.privacy_policy_title),
+            subtitle = stringResource(R.string.privacy_policy_subtitle),
             onClick = onPrivacyPolicyClick
         )
 
         SettingsOption(
             icon = Icons.Default.Info,
-            title = "About",
-            subtitle = "App version and information",
+            title = stringResource(R.string.about_title),
+            subtitle = stringResource(R.string.about_subtitle),
             onClick = {
-                Toast.makeText(context, "Personal Network Tree v1.0.0", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.app_version_toast), Toast.LENGTH_SHORT).show()
             }
         )
 
@@ -93,7 +95,7 @@ fun SettingsView(
                 contentDescription = null
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Sign Out")
+            Text(stringResource(R.string.sign_out))
         }
     }
 }

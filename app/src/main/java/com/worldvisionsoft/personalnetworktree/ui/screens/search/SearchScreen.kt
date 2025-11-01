@@ -9,42 +9,49 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.worldvisionsoft.personalnetworktree.R
+import com.worldvisionsoft.personalnetworktree.data.model.Contact
+import com.worldvisionsoft.personalnetworktree.data.repository.ContactRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onContactClick: (String) -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val repository = remember(context) { ContactRepository(context) }
+    val allContacts by repository.contacts.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
 
-    // Sample data - replace with actual data from repository
-    val allContacts = remember {
-        listOf(
-            "Alice Johnson", "Bob Smith", "Carol Davis",
-            "David Wilson", "Emma Brown", "Frank Miller",
-            "Grace Lee", "Henry Taylor", "Iris Chen"
-        )
-    }
-
-    val filteredContacts = remember(searchQuery) {
+    val filteredContacts = remember(searchQuery, allContacts) {
         if (searchQuery.isEmpty()) {
             allContacts
         } else {
-            allContacts.filter { it.contains(searchQuery, ignoreCase = true) }
+            allContacts.filter { contact ->
+                contact.name.contains(searchQuery, ignoreCase = true) ||
+                contact.email.contains(searchQuery, ignoreCase = true) ||
+                contact.phone.contains(searchQuery, ignoreCase = true) ||
+                contact.company.contains(searchQuery, ignoreCase = true) ||
+                contact.position.contains(searchQuery, ignoreCase = true) ||
+                contact.tags.any { it.contains(searchQuery, ignoreCase = true) }
+            }
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Search Network") },
+                title = { Text(stringResource(R.string.search_network)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 },
@@ -67,11 +74,11 @@ fun SearchScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Search contacts by name...") },
+                placeholder = { Text(stringResource(R.string.search_contacts_placeholder)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Search"
+                        contentDescription = stringResource(R.string.cd_search_icon)
                     )
                 },
                 trailingIcon = {
@@ -79,7 +86,7 @@ fun SearchScreen(
                         IconButton(onClick = { searchQuery = "" }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear"
+                                contentDescription = stringResource(R.string.cd_clear)
                             )
                         }
                     }
@@ -87,7 +94,7 @@ fun SearchScreen(
                 singleLine = true
             )
 
-            Divider()
+            HorizontalDivider()
 
             // Search Results
             if (filteredContacts.isEmpty()) {
@@ -108,14 +115,14 @@ fun SearchScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "No contacts found",
+                            text = stringResource(R.string.no_contacts_found),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Try a different search term",
+                            text = stringResource(R.string.try_different_search),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -129,8 +136,13 @@ fun SearchScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     item {
+                        val contactsText = if (filteredContacts.size != 1) {
+                            stringResource(R.string.contacts_found_format, filteredContacts.size, stringResource(R.string.contact_plural))
+                        } else {
+                            stringResource(R.string.one_contact_found)
+                        }
                         Text(
-                            text = "${filteredContacts.size} contact${if (filteredContacts.size != 1) "s" else ""} found",
+                            text = contactsText,
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -138,7 +150,10 @@ fun SearchScreen(
                     }
 
                     items(filteredContacts) { contact ->
-                        SearchResultItem(name = contact)
+                        SearchResultItem(
+                            contact = contact,
+                            onClick = { onContactClick(contact.id) }
+                        )
                     }
                 }
             }
@@ -148,10 +163,13 @@ fun SearchScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultItem(name: String) {
+fun SearchResultItem(
+    contact: Contact,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        onClick = { /* Navigate to contact detail */ }
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -169,7 +187,7 @@ fun SearchResultItem(name: String) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = name.take(1),
+                        text = contact.name.take(1).uppercase(),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -181,15 +199,36 @@ fun SearchResultItem(name: String) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = name,
+                    text = contact.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = "Tap to view profile",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                if (contact.company.isNotEmpty()) {
+                    Text(
+                        text = contact.company,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else if (contact.position.isNotEmpty()) {
+                    Text(
+                        text = contact.position,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.tap_to_view_profile),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (contact.tags.isNotEmpty()) {
+                    Text(
+                        text = contact.tags.joinToString(", "),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
 
             Icon(

@@ -6,18 +6,20 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.auth.FirebaseAuth
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.ui.theme.PersonalNetworkTreeTheme
 
 enum class NavigationItem(
-    val title: String,
+    val titleRes: Int,
     val icon: androidx.compose.ui.graphics.vector.ImageVector
 ) {
-    NETWORK("Network", Icons.Default.AccountTree),
-    CONTACTS("Contacts", Icons.Default.People),
-    REMINDERS("Reminders", Icons.Default.Notifications),
-    SETTINGS("Settings", Icons.Default.Settings)
+    NETWORK(R.string.network, Icons.Default.AccountTree),
+    CONTACTS(R.string.contacts, Icons.Default.People),
+    REMINDERS(R.string.reminders, Icons.Default.Notifications),
+    SETTINGS(R.string.settings, Icons.Default.Settings)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,12 +38,12 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Personal Network Tree") },
+                title = { Text(stringResource(R.string.personal_network_tree)) },
                 actions = {
                     IconButton(onClick = onSearchClick) {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
+                            contentDescription = stringResource(R.string.search)
                         )
                     }
                 },
@@ -60,10 +62,10 @@ fun DashboardScreen(
                         icon = {
                             Icon(
                                 imageVector = item.icon,
-                                contentDescription = item.title
+                                contentDescription = stringResource(item.titleRes)
                             )
                         },
-                        label = { Text(item.title) }
+                        label = { Text(stringResource(item.titleRes)) }
                     )
                 }
             }
@@ -77,7 +79,7 @@ fun DashboardScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add Contact"
+                        contentDescription = stringResource(R.string.add_contact)
                     )
                 }
             }

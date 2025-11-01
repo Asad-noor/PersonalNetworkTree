@@ -20,10 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.data.model.Contact
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,10 +117,10 @@ fun AddEditContactScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(if (contactId == null) "Add Contact" else "Edit Contact") },
+                title = { Text(if (contactId == null) stringResource(R.string.add_contact_title) else stringResource(R.string.edit_contact_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -140,7 +142,7 @@ fun AddEditContactScreen(
                         },
                         enabled = name.isNotBlank() && !uiState.isLoading
                     ) {
-                        Text("SAVE")
+                        Text(stringResource(R.string.save_button))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -211,7 +213,7 @@ fun AddEditContactScreen(
             }
 
             Text(
-                text = "Tap to add photo",
+                text = stringResource(R.string.tap_to_add_photo),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
@@ -223,7 +225,7 @@ fun AddEditContactScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name *") },
+                label = { Text(stringResource(R.string.name_required)) },
                 leadingIcon = { Icon(Icons.Default.Person, null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -232,7 +234,7 @@ fun AddEditContactScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email_label)) },
                 leadingIcon = { Icon(Icons.Default.Email, null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -241,7 +243,7 @@ fun AddEditContactScreen(
             OutlinedTextField(
                 value = phone,
                 onValueChange = { phone = it },
-                label = { Text("Phone") },
+                label = { Text(stringResource(R.string.phone_label)) },
                 leadingIcon = { Icon(Icons.Default.Phone, null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -250,7 +252,7 @@ fun AddEditContactScreen(
             OutlinedTextField(
                 value = company,
                 onValueChange = { company = it },
-                label = { Text("Company") },
+                label = { Text(stringResource(R.string.company_label)) },
                 leadingIcon = { Icon(Icons.Default.Business, null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -259,7 +261,7 @@ fun AddEditContactScreen(
             OutlinedTextField(
                 value = position,
                 onValueChange = { position = it },
-                label = { Text("Position") },
+                label = { Text(stringResource(R.string.position_label)) },
                 leadingIcon = { Icon(Icons.Default.Work, null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -267,7 +269,7 @@ fun AddEditContactScreen(
 
             // Relationship Level Section
             Text(
-                text = "Relationship Level",
+                text = stringResource(R.string.relationship_level),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -301,7 +303,7 @@ fun AddEditContactScreen(
 
             // Tags Section
             Text(
-                text = "Tags & Categories",
+                text = stringResource(R.string.tags_and_categories),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -329,14 +331,14 @@ fun AddEditContactScreen(
             ) {
                 Icon(Icons.Default.Add, null)
                 Spacer(Modifier.width(8.dp))
-                Text("Add Tags")
+                Text(stringResource(R.string.add_tags))
             }
 
             // Notes
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
+                label = { Text(stringResource(R.string.notes_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
@@ -367,7 +369,7 @@ fun AddEditContactScreen(
     if (showTagDialog) {
         AlertDialog(
             onDismissRequest = { showTagDialog = false },
-            title = { Text("Select Tags") },
+            title = { Text(stringResource(R.string.select_tags)) },
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -389,7 +391,7 @@ fun AddEditContactScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showTagDialog = false }) {
-                    Text("Done")
+                    Text(stringResource(R.string.done))
                 }
             }
         )
@@ -399,7 +401,7 @@ fun AddEditContactScreen(
     if (showLevelDialog) {
         AlertDialog(
             onDismissRequest = { showLevelDialog = false },
-            title = { Text("Select Relationship Level") },
+            title = { Text(stringResource(R.string.select_relationship_level)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     for (level in 1..5) {
@@ -412,7 +414,7 @@ fun AddEditContactScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
-                                    text = "Level $level: ${getLevelLabel(level)}",
+                                    text = stringResource(R.string.level_format, level, getLevelLabel(level)),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = if (relationshipLevel == level) FontWeight.Bold else FontWeight.Normal
                                 )
@@ -428,31 +430,33 @@ fun AddEditContactScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showLevelDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
     }
 }
 
+@Composable
 private fun getLevelLabel(level: Int): String {
     return when (level) {
-        1 -> "Close Friends & Family"
-        2 -> "Classmates & Close Colleagues"
-        3 -> "Batch Mates & Professional Network"
-        4 -> "Colleagues & Business Contacts"
-        5 -> "Friends of Friends & Acquaintances"
-        else -> "Unknown"
+        1 -> stringResource(R.string.level_1)
+        2 -> stringResource(R.string.level_2)
+        3 -> stringResource(R.string.level_3)
+        4 -> stringResource(R.string.level_4)
+        5 -> stringResource(R.string.level_5)
+        else -> stringResource(R.string.unknown_level)
     }
 }
 
+@Composable
 private fun getLevelDescription(level: Int): String {
     return when (level) {
-        1 -> "Your strongest bonds"
-        2 -> "Regular interaction"
-        3 -> "Occasional interaction"
-        4 -> "Professional relationships"
-        5 -> "Extended network"
+        1 -> stringResource(R.string.level_1_desc)
+        2 -> stringResource(R.string.level_2_desc)
+        3 -> stringResource(R.string.level_3_desc)
+        4 -> stringResource(R.string.level_4_desc)
+        5 -> stringResource(R.string.level_5_desc)
         else -> ""
     }
 }

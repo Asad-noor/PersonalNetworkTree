@@ -1,3 +1,230 @@
 <resources>
     <string name="app_name">Personal Network Tree</string>
+
+    <!-- Authentication Screen -->
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="create_account">Create Account</string>
+    <string name="login_to_continue">Login to continue</string>
+    <string name="signup_to_get_started">Sign up to get started</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Contact Screens -->
+    <string name="edit_contact">Edit Contact</string>
+    <string name="contact_details">Contact Details</string>
+    <string name="save">SAVE</string>
+    <string name="tap_to_add_photo">Tap to add photo</string>
+    <string name="name_required">Name *</string>
+    <string name="phone">Phone</string>
+    <string name="company">Company</string>
+    <string name="position">Position</string>
+    <string name="relationship_level">Relationship Level</string>
+    <string name="tags_and_categories">Tags &amp; Categories</string>
+    <string name="add_tags">Add Tags</string>
+    <string name="notes">Notes</string>
+    <string name="select_tags">Select Tags</string>
+    <string name="done">Done</string>
+    <string name="select_relationship_level">Select Relationship Level</string>
+    <string name="back">Back</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="contact_photo">Contact Photo</string>
+
+    <!-- Relationship Levels -->
+    <string name="level_1">Close Friends &amp; Family</string>
+    <string name="level_2">Classmates &amp; Close Colleagues</string>
+    <string name="level_3">Batch Mates &amp; Professional Network</string>
+    <string name="level_4">Colleagues &amp; Business Contacts</string>
+    <string name="level_5">Friends of Friends &amp; Acquaintances</string>
+    <string name="level_1_desc">Your strongest bonds</string>
+    <string name="level_2_desc">Regular interaction</string>
+    <string name="level_3_desc">Occasional interaction</string>
+    <string name="level_4_desc">Professional relationships</string>
+    <string name="level_5_desc">Extended network</string>
+
+    <!-- Contact Detail Screen -->
+    <string name="tags">Tags</string>
+    <string name="contact_information">Contact Information</string>
+    <string name="log_interaction">Log Interaction</string>
+    <string name="past_interactions">Past Interactions (%d)</string>
+    <string name="no_interactions_yet">No interactions yet</string>
+    <string name="log_first_interaction">Log your first interaction</string>
+    <string name="delete_contact_title">Delete Contact?</string>
+    <string name="delete_contact_message">Are you sure you want to delete %s? This action cannot be undone. All interactions and photos will also be deleted.</string>
+    <string name="warning">Warning</string>
+
+    <!-- Interaction Screen -->
+    <string name="set_reminder">Set Reminder</string>
+    <string name="log_interaction_title">Log Interaction</string>
+    <string name="interaction_type">Type</string>
+    <string name="title_required">Title *</string>
+    <string name="title_placeholder">e.g., Had coffee, Project discussion</string>
+    <string name="description">Description</string>
+    <string name="description_placeholder">Discussed project X, next steps...</string>
+    <string name="location">Location</string>
+    <string name="location_placeholder">e.g., Starbucks Downtown</string>
+    <string name="date">Date</string>
+    <string name="contact_required">Contact *</string>
+    <string name="select_a_contact">Select a contact</string>
+    <string name="interaction_with">Interaction with %s</string>
+    <string name="select_interaction_type">Select Interaction Type</string>
+    <string name="select_contact">Select Contact</string>
+    <string name="reminder_saved_message">Reminder saved! Opening Calendar app...</string>
+
+    <!-- Interaction Types -->
+    <string name="meeting">Meeting</string>
+    <string name="call">Call</string>
+    <string name="coffee">Coffee</string>
+    <string name="event">Event</string>
+    <string name="note">Note</string>
+    <string name="other">Other</string>
+
+    <!-- Reminders -->
+    <string name="no_reminders">No Reminders</string>
+    <string name="set_reminders_message">Set reminders to stay connected</string>
+    <string name="add_reminder">Add Reminder</string>
+    <string name="overdue">OVERDUE</string>
+    <string name="upcoming">UPCOMING</string>
+    <string name="reminder_saved">Reminder saved! Opening Calendar app...</string>
+
+    <!-- Messages -->
+    <string name="contact_added_successfully">Contact added successfully</string>
+    <string name="contact_updated_successfully">Contact updated successfully</string>
+    <string name="failed_to_save_contact">Failed to save contact</string>
+    <string name="failed_to_add_interaction">Failed to add interaction</string>
+    <string name="failed_to_set_reminder">Failed to set reminder</string>
+    <string name="failed_to_delete_contact">Failed to delete contact</string>
+    <string name="opened_calendar_app">Opened Calendar app to add reminder: %s</string>
+    <string name="failed_to_open_calendar">Failed to open Calendar app</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_hide_password">Hide password</string>
+    <string name="cd_show_password">Show password</string>
+    <string name="cd_person_icon">Person</string>
+    <string name="cd_email_icon">Email</string>
+    <string name="cd_lock_icon">Lock</string>
+    <string name="cd_app_logo">App Logo</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_search_icon">Search</string>
+    <string name="cd_clear">Clear</string>
+    <string name="cd_confirm_password">Confirm Password</string>
+
+    <!-- Labels -->
+    <string name="label_email">Email</string>
+    <string name="label_phone">Phone</string>
+    <string name="label_notes">Notes</string>
+
+    <!-- Privacy -->
+    <string name="privacy_policy">Privacy Policy</string>
+
+    <!-- Common -->
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="unknown">Unknown</string>
+
+    <!-- ContactsListView -->
+    <string name="no_contacts">No Contacts</string>
+    <string name="add_contacts_message">Add contacts to see them here</string>
+
+    <!-- Dialog Messages -->
+    <string name="delete_reminder_title">Delete Reminder?</string>
+    <string name="delete_reminder_message">Are you sure you want to delete this reminder?</string>
+    <string name="mark_complete_title">Mark as Complete?</string>
+    <string name="mark_complete_message">Mark this reminder as completed?</string>
+    <string name="complete">Complete</string>
+    <string name="mark_complete">Mark Complete</string>
+
+    <!-- SearchScreen -->
+    <string name="search_network">Search Network</string>
+    <string name="search_contacts_placeholder">Search contacts by name...</string>
+
+    <!-- AuthScreen -->
+    <string name="forgot_password_question">Forgot Password?</string>
+    <string name="send_reset_link">Send Reset Link</string>
+
+    <!-- SettingsView -->
+    <string name="sign_out">Sign Out</string>
+
+    <!-- DashboardScreen -->
+    <string name="personal_network_tree">Personal Network Tree</string>
+    <string name="network">Network</string>
+    <string name="contacts">Contacts</string>
+    <string name="reminders">Reminders</string>
+    <string name="settings">Settings</string>
+    <string name="search">Search</string>
+    <string name="add_contact">Add Contact</string>
+
+    <!-- RemindersView -->
+    <string name="reminder_date_time">Reminder Date &amp; Time</string>
+    <string name="get_notified_message">Get notified about this interaction</string>
+
+    <!-- SearchScreen -->
+    <string name="no_contacts_found">No contacts found</string>
+    <string name="try_different_search">Try a different search term</string>
+    <string name="contacts_found">%d contact%s found</string>
+    <string name="contacts_found_singular">s</string>
+    <string name="contacts_found_plural">s</string>
+    <string name="tap_to_view_profile">Tap to view profile</string>
+
+    <!-- Interaction Type Labels -->
+    <string name="type_label">Type</string>
+
+    <!-- Plurals -->
+    <string name="contact_singular"></string>
+    <string name="contact_plural">s</string>
+
+    <!-- AuthScreen - Additional -->
+    <string name="welcome_back_title">Welcome Back!</string>
+    <string name="create_account_title">Create Account</string>
+    <string name="login_button">Login</string>
+    <string name="sign_up_button">Sign Up</string>
+
+    <!-- AddEditContactScreen - Additional -->
+    <string name="add_contact_title">Add Contact</string>
+    <string name="edit_contact_title">Edit Contact</string>
+    <string name="save_button">SAVE</string>
+    <string name="email_label">Email</string>
+    <string name="phone_label">Phone</string>
+    <string name="company_label">Company</string>
+    <string name="position_label">Position</string>
+    <string name="notes_label">Notes</string>
+    <string name="level_format">Level %d: %s</string>
+    <string name="unknown_level">Unknown</string>
+
+    <!-- ContactDetailScreen - Additional -->
+    <string name="delete_contact_question">Delete Contact?</string>
+    <string name="delete_contact_confirmation">Are you sure you want to delete %s? This action cannot be undone. All interactions and photos will also be deleted.</string>
+
+    <!-- SearchScreen - Additional -->
+    <string name="contacts_found_format">%d contact%s found</string>
+    <string name="one_contact_found">1 contact found</string>
+
+    <!-- SettingsView - Additional -->
+    <string name="account_label">Account</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_policy_subtitle">View our privacy policy</string>
+    <string name="about_title">About</string>
+    <string name="about_subtitle">App version and information</string>
+    <string name="app_version_toast">Personal Network Tree v1.0.0</string>
+
+    <!-- NetworkGraphView - Additional -->
+    <string name="me_label">Me</string>
+    <string name="close_friends_label">Close Friends</string>
+    <string name="classmates_label">Classmates</string>
+    <string name="batch_mates_label">Batch Mates</string>
+    <string name="colleagues_label">Colleagues</string>
+    <string name="extended_network_label">Extended Network</string>
+    <string name="level_format_label">Level %d</string>
+    <string name="you_label">You</string>
 </resources>

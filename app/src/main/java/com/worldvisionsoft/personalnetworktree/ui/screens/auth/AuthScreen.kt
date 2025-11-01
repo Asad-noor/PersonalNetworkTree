@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.worldvisionsoft.personalnetworktree.R
 import com.worldvisionsoft.personalnetworktree.ui.theme.PersonalNetworkTreeTheme
 
 @Composable
@@ -59,12 +61,12 @@ fun AuthScreen(
     if (showResetPasswordDialog) {
         AlertDialog(
             onDismissRequest = { showResetPasswordDialog = false },
-            title = { Text("Reset Password") },
+            title = { Text(stringResource(R.string.reset_password)) },
             text = {
                 OutlinedTextField(
                     value = resetEmail,
                     onValueChange = { resetEmail = it },
-                    label = { Text("Email") },
+                    label = { Text(stringResource(R.string.email)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true
                 )
@@ -79,12 +81,12 @@ fun AuthScreen(
                         }
                     }
                 ) {
-                    Text("Send Reset Link")
+                    Text(stringResource(R.string.send_reset_link))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showResetPasswordDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -101,7 +103,7 @@ fun AuthScreen(
         ) {
             // Title
             Text(
-                text = if (isLoginMode) "Welcome Back!" else "Create Account",
+                text = if (isLoginMode) stringResource(R.string.welcome_back_title) else stringResource(R.string.create_account_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -110,7 +112,7 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = if (isLoginMode) "Login to continue" else "Sign up to get started",
+                text = if (isLoginMode) stringResource(R.string.login_to_continue) else stringResource(R.string.signup_to_get_started),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -139,9 +141,9 @@ fun AuthScreen(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") },
+                    label = { Text(stringResource(R.string.name)) },
                     leadingIcon = {
-                        Icon(Icons.Default.Person, contentDescription = "Name")
+                        Icon(Icons.Default.Person, contentDescription = stringResource(R.string.cd_person_icon))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
@@ -154,9 +156,9 @@ fun AuthScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email)) },
                 leadingIcon = {
-                    Icon(Icons.Default.Email, contentDescription = "Email")
+                    Icon(Icons.Default.Email, contentDescription = stringResource(R.string.cd_email_icon))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
@@ -170,15 +172,15 @@ fun AuthScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.password)) },
                 leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = "Password")
+                    Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.cd_lock_icon))
                 },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            contentDescription = if (passwordVisible) stringResource(R.string.cd_hide_password) else stringResource(R.string.cd_show_password)
                         )
                     }
                 },
@@ -196,15 +198,15 @@ fun AuthScreen(
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password") },
+                    label = { Text(stringResource(R.string.confirm_password)) },
                     leadingIcon = {
-                        Icon(Icons.Default.Lock, contentDescription = "Confirm Password")
+                        Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.cd_confirm_password))
                     },
                     trailingIcon = {
                         IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                             Icon(
                                 imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
+                                contentDescription = if (confirmPasswordVisible) stringResource(R.string.cd_hide_password) else stringResource(R.string.cd_show_password)
                             )
                         }
                     },
@@ -223,7 +225,7 @@ fun AuthScreen(
                     modifier = Modifier.align(Alignment.End),
                     enabled = !authState.isLoading
                 ) {
-                    Text("Forgot Password?")
+                    Text(stringResource(R.string.forgot_password_question))
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -260,7 +262,7 @@ fun AuthScreen(
                     )
                 } else {
                     Text(
-                        text = if (isLoginMode) "Login" else "Sign Up",
+                        text = if (isLoginMode) stringResource(R.string.login_button) else stringResource(R.string.sign_up_button),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -274,7 +276,7 @@ fun AuthScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (isLoginMode) "Don't have an account?" else "Already have an account?",
+                    text = if (isLoginMode) stringResource(R.string.dont_have_account) else stringResource(R.string.already_have_account),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 TextButton(
@@ -285,7 +287,7 @@ fun AuthScreen(
                     enabled = !authState.isLoading
                 ) {
                     Text(
-                        text = if (isLoginMode) "Sign Up" else "Login",
+                        text = if (isLoginMode) stringResource(R.string.sign_up_button) else stringResource(R.string.login_button),
                         fontWeight = FontWeight.Bold
                     )
                 }

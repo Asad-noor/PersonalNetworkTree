@@ -1,7 +1,63 @@
+## 🚀 Quick Start Guide
+
+### Prerequisites
+Before you begin, ensure you have:
+- **Android Studio** (Latest version - Arctic Fox or newer)
+- **JDK 11** or higher
+- **Active internet connection**
+- **Google Account** (for Firebase setup)
+
+### Step 1: Extract the Project
+1. Extract the downloaded ZIP file to your desired location
+2. Note the project folder path
+
+### Step 2: Open in Android Studio
+1. Launch **Android Studio**
+2. Click **"Open"** (or File → Open)
+3. Navigate to the extracted project folder
+4. Select the **"PersonalNetworkTree"** folder
+5. Click **"OK"**
+6. Wait for Gradle sync to complete (this may take a few minutes)
+
+## 🎓 Learning Resources
+
+This project is excellent for learning:
+- ✅ **Jetpack Compose** - Modern Android UI development
+- ✅ **Firebase Integration** - Cloud backend services
+- ✅ **MVVM Architecture** - Clean, maintainable code structure
+- ✅ **Material Design 3** - Latest design patterns
+- ✅ **Navigation Compose** - Modern navigation patterns
+- ✅ **State Management** - StateFlow and reactive programming
+- ✅ **Repository Pattern** - Data layer abstraction
+- ✅ **Coroutines** - Asynchronous programming in Kotlin
+
+## 🔧 Customization Guide
+
+### Change App Name
+1. Open `app/src/main/res/values/strings.xml`
+2. Modify: `<string name="app_name">Your App Name</string>`
+
+### Change Package Name
+1. Right-click on package in Android Studio
+2. Select "Refactor" → "Rename"
+3. Update `applicationId` in `app/build.gradle.kts`
+4. Update in Firebase Console settings
+
+### Change App Theme/Colors
+1. Open `app/src/main/java/.../ui/theme/Color.kt`
+2. Modify color values
+3. Update Material 3 color scheme in `Theme.kt`
+
+### Change App Icon
+1. Right-click on `res` folder → New → Image Asset
+2. Select "Launcher Icons (Adaptive and Legacy)"
+3. Choose your icon image
+4. Configure foreground/background
+5. Click "Next" → "Finish"
+
+
 # 🔥 Firebase Setup Guide for Personal Network Tree App
 ## Complete Step-by-Step Guide (For Non-Technical Users)
-
----
 
 ## 📋 What You'll Need
 
@@ -60,7 +116,8 @@ Firebase is Google's cloud service that stores your app's data (like contacts an
 2. Click the **Android icon** (looks like a robot)
 
 3. **Register Your App:**
-   - **Android package name:** Enter exactly: `com.worldvisionsoft.personalnetworktree`
+   - **Android package name:** Enter exactly what you have updated to the android app project like
+   `com.example.personalnetworktree`
    - **App nickname (optional):** You can leave this blank
    - **Debug signing certificate (optional):** Leave blank for now
    - Click **Register app**
@@ -301,55 +358,6 @@ PersonalNetworkTree/
 
 # 🎉 Setup Complete!
 
-## What You've Accomplished:
-
-✅ Created a Firebase project  
-✅ Enabled Email/Password authentication  
-✅ Set up Realtime Database  
-✅ Configured secure access rules  
-✅ Added the configuration file to your Android app  
-✅ Tested the app and verified data storage  
-
----
-
-## 📊 Understanding Your Data Structure
-
-Your app stores data in Firebase like this:
-
-```
-Firebase Realtime Database
-└── users/
-    └── {userId} (unique ID for each user)
-        ├── contacts/
-        │   └── {contactId}/
-        │       ├── name: "John Doe"
-        │       ├── email: "john@example.com"
-        │       ├── phone: "+1234567890"
-        │       ├── company: "Tech Corp"
-        │       ├── position: "CEO"
-        │       ├── photoUrl: "content://..." (local device path)
-        │       ├── tags: ["Friend", "Business"]
-        │       ├── relationshipLevel: 1 (1=closest, 5=distant)
-        │       ├── notes: "Met at conference"
-        │       └── createdAt: 1234567890
-        │
-        ├── interactions/
-        │   └── {interactionId}/
-        │       ├── contactId: "abc123"
-        │       ├── type: "MEETING"
-        │       ├── title: "Coffee meeting"
-        │       ├── description: "Discussed project"
-        │       ├── date: 1234567890
-        │       └── location: "Starbucks"
-        │
-        └── tags/
-            └── {tagId}/
-                ├── name: "Friend"
-                └── color: "#FF6B6B"
-```
-
----
-
 ## 🔒 Important Notes About Privacy & Storage
 
 ### What's Stored in Firebase (Cloud):
@@ -377,7 +385,7 @@ Firebase Realtime Database
 ### Issue 1: "App not registered" Error
 **Solution:**
 - Check that `google-services.json` is in the correct location (`app` folder)
-- Verify the package name matches: `com.worldvisionsoft.personalnetworktree`
+- Verify the package name matches with your given package name in the project
 - Rebuild the project
 
 ### Issue 2: "Authentication failed" Error
@@ -448,9 +456,6 @@ Before delivering to your client, ensure:
 
 **Firebase Console URL:**  
 https://console.firebase.google.com
-
-**Package Name:**  
-`com.worldvisionsoft.personalnetworktree`
 
 **File to Replace:**  
 `app/google-services.json`

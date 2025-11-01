@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.util.UUID
 
 object ImageUtils {
@@ -12,6 +13,9 @@ object ImageUtils {
      * This ensures the image is always accessible, even after app restart
      */
     fun copyImageToInternalStorage(context: Context, sourceUri: Uri, contactId: String): String? {
+        var inputStream: InputStream? = null
+        var outputStream: FileOutputStream? = null
+
         return try {
             // Create a unique filename for the contact photo
             val fileName = "contact_${contactId}_${UUID.randomUUID()}.jpg"
@@ -26,17 +30,27 @@ object ImageUtils {
             val destinationFile = File(photosDir, fileName)
 
             // Copy the image from source URI to internal storage
-            context.contentResolver.openInputStream(sourceUri)?.use { input ->
-                FileOutputStream(destinationFile).use { output ->
-                    input.copyTo(output)
-                }
-            }
+            inputStream = context.contentResolver.openInputStream(sourceUri)
+            outputStream = FileOutputStream(destinationFile)
+
+            inputStream?.copyTo(outputStream)
 
             // Return the file URI as a string
             Uri.fromFile(destinationFile).toString()
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("ImageUtils", "Error copying image", e)
             null
+        } finally {
+            try {
+                inputStream?.close()
+            } catch (e: Exception) {
+                android.util.Log.e("ImageUtils", "Error closing input stream", e)
+            }
+            try {
+                outputStream?.close()
+            } catch (e: Exception) {
+                android.util.Log.e("ImageUtils", "Error closing output stream", e)
+            }
         }
     }
 
@@ -56,7 +70,7 @@ object ImageUtils {
                 false
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("ImageUtils", "Error deleting photo", e)
             false
         }
     }
