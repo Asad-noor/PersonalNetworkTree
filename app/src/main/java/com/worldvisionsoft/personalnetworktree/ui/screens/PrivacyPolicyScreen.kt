@@ -4,7 +4,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -26,7 +26,7 @@ fun PrivacyPolicyScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.cd_back)
                         )
                     }
@@ -60,7 +60,7 @@ fun PrivacyPolicyScreen(
                         settings.displayZoomControls = false
 
                         // Load your privacy policy URL
-                        loadUrl("https://worldvisionsoft.com/glam-photo-editor-policy/")
+                        loadUrl(context.getString(R.string.privacy_url))
                     }
                 },
                 modifier = Modifier.fillMaxSize()

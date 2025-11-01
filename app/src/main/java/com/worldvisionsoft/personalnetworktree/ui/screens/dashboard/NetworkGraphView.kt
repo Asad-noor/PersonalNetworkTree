@@ -399,11 +399,11 @@ fun NetworkGraphView(
             selectedNode?.let { node ->
                 // Get relationship level info
                 val levelLabel = when (node.level) {
-                    1 -> "Close Friends"
-                    2 -> "Classmates"
-                    3 -> "Batch Mates"
-                    4 -> "Colleagues"
-                    5 -> "Extended Network"
+                    1 -> stringResource(R.string.close_friends_label)
+                    2 -> stringResource(R.string.classmates_label)
+                    3 -> stringResource(R.string.batch_mates_label)
+                    4 -> stringResource(R.string.colleagues_label)
+                    5 -> stringResource(R.string.extended_network_label)
                     else -> "Level ${node.level}"
                 }
 
@@ -483,34 +483,6 @@ fun NetworkGraphView(
                 )
             }
         }
-
-        // User info overlay with legend
-//        currentUserEmail?.let {
-//            Card(
-//                modifier = Modifier
-//                    .align(Alignment.TopStart)
-//                    .padding(16.dp),
-//                colors = CardDefaults.cardColors(
-//                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.95f)
-//                )
-//            ) {
-//                Column(modifier = Modifier.padding(12.dp)) {
-//                    Text(
-//                        text = "Your Network Tree",
-//                        style = MaterialTheme.typography.labelLarge,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                    Spacer(modifier = Modifier.height(8.dp))
-//
-//                    // Level legend
-//                    LevelIndicator(1, "Close Friends", Color(0xFFE91E63))
-//                    LevelIndicator(2, "Classmates", Color(0xFF9C27B0))
-//                    LevelIndicator(3, "Batch Mates", Color(0xFF3F51B5))
-//                    LevelIndicator(4, "Colleagues", Color(0xFF009688))
-//                    LevelIndicator(5, "Extended", Color(0xFF4CAF50))
-//                }
-//            }
-//        }
     }
 }
 
