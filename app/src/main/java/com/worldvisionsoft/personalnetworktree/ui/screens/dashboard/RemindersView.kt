@@ -125,9 +125,10 @@ fun RemindersView(
 fun ReminderItem(
     reminder: Reminder,
     repository: ReminderRepository,
-    isOverdue: Boolean
+    isOverdue: Boolean,
 ) {
-    val dateTimeFormat = remember { SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault()) }
+    val context = LocalContext.current
+    val dateTimeFormat = remember { SimpleDateFormat(context.getString(R.string.date_format_with_time), Locale.getDefault()) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showCompleteDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()

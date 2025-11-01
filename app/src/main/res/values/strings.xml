@@ -268,4 +268,5 @@
     <string name="date_format_short">MMM dd, yyyy</string>
     <string name="date_format_with_time">MMM dd, yyyy hh:mm a</string>
     <string name="privacy_url">https://worldvisionsoft.com/glam-photo-editor-policy/</string>
+    <string name="year_and_month">MMM dd, yyyy</string>
 </resources>

@@ -404,7 +404,8 @@ fun ContactInfoRow(
 
 @Composable
 fun InteractionCard(interaction: Interaction) {
-    val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
+    val context = LocalContext.current
+    val dateFormat = remember { SimpleDateFormat(context.getString(R.string.year_and_month), Locale.getDefault()) }
 
     Card {
         Row(
