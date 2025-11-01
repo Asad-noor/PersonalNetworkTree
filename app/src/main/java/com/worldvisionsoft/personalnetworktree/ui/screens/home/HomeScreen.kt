@@ -9,7 +9,6 @@ import com.worldvisionsoft.personalnetworktree.ui.theme.PersonalNetworkTreeTheme
 fun HomeScreen(
     onSignOut: () -> Unit = {},
     onAddContact: () -> Unit = {},
-    onSearchClick: () -> Unit = {},
     onContactClick: (String) -> Unit = {},
     onPrivacyPolicyClick: () -> Unit = {},
     onAddReminder: () -> Unit = {}
@@ -17,7 +16,6 @@ fun HomeScreen(
     DashboardScreen(
         onSignOut = onSignOut,
         onAddContact = onAddContact,
-        onSearchClick = onSearchClick,
         onContactClick = onContactClick,
         onPrivacyPolicyClick = onPrivacyPolicyClick,
         onAddReminder = onAddReminder

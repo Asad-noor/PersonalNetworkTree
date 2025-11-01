@@ -27,12 +27,12 @@ enum class NavigationItem(
 fun DashboardScreen(
     onSignOut: () -> Unit = {},
     onAddContact: () -> Unit = {},
-    onSearchClick: () -> Unit = {},
     onContactClick: (String) -> Unit = {},
     onPrivacyPolicyClick: () -> Unit = {},
     onAddReminder: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(NavigationItem.NETWORK) }
+    var showSearchInContacts by remember { mutableStateOf(false) }
     val currentUser = FirebaseAuth.getInstance().currentUser
 
     Scaffold(
@@ -40,7 +40,11 @@ fun DashboardScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.personal_network_tree)) },
                 actions = {
-                    IconButton(onClick = onSearchClick) {
+                    IconButton(onClick = {
+                        // Switch to Contacts tab and show search
+                        selectedTab = NavigationItem.CONTACTS
+                        showSearchInContacts = true
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = stringResource(R.string.search)
@@ -58,7 +62,13 @@ fun DashboardScreen(
                 NavigationItem.values().forEach { item ->
                     NavigationBarItem(
                         selected = selectedTab == item,
-                        onClick = { selectedTab = item },
+                        onClick = {
+                            selectedTab = item
+                            // Reset search visibility when switching tabs
+                            if (item != NavigationItem.CONTACTS) {
+                                showSearchInContacts = false
+                            }
+                        },
                         icon = {
                             Icon(
                                 imageVector = item.icon,
@@ -96,7 +106,8 @@ fun DashboardScreen(
                     onNodeClick = onContactClick
                 )
                 NavigationItem.CONTACTS -> ContactsListView(
-                    onContactClick = onContactClick
+                    onContactClick = onContactClick,
+                    showSearchInitially = showSearchInContacts
                 )
                 NavigationItem.REMINDERS -> RemindersView(
                     onAddReminderClick = onAddReminder

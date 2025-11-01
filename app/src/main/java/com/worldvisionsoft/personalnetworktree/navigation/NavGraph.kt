@@ -7,7 +7,6 @@ import androidx.navigation.compose.composable
 import com.worldvisionsoft.personalnetworktree.ui.screens.auth.AuthScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.home.HomeScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.splash.SplashScreen
-import com.worldvisionsoft.personalnetworktree.ui.screens.search.SearchScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.contact.AddEditContactScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.contact.ContactDetailScreen
 import com.worldvisionsoft.personalnetworktree.ui.screens.contact.AddInteractionScreen
@@ -65,22 +64,11 @@ fun NavGraph(navController: NavHostController) {
                 onContactClick = { contactId ->
                     navController.navigate("contactDetail/$contactId")
                 },
-                onSearchClick = {
-                    navController.navigate("search")
-                },
                 onPrivacyPolicyClick = {
                     navController.navigate("privacyPolicy")
                 },
                 onAddReminder = {
                     navController.navigate("addReminder")
-                }
-            )
-        }
-
-        composable(route = "search") {
-            SearchScreen(
-                onBackClick = {
-                    navController.popBackStack()
                 }
             )
         }
