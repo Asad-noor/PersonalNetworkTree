@@ -146,22 +146,6 @@
 
 ---
 
-## 🎓 What You'll Learn
-
-By studying this codebase, you'll learn:
-- Modern Android development with Jetpack Compose
-- MVVM architecture implementation
-- Firebase integration (Auth + Realtime Database)
-- Kotlin Coroutines and Flow
-- Material Design 3 implementation
-- Navigation Component usage
-- Image handling and storage
-- Repository pattern
-- State management in Compose
-- Error handling best practices
-
----
-
 ## ✅ Code Quality Standards Met
 
 ✅ **Follows Java and Kotlin coding standards**
